@@ -1,0 +1,24 @@
+name: Publish
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check me out
+        uses: actions/checkout@v3
+
+      - name: Build react
+        run: |
+          npm run build
+
+      - name: Publish to Cloudflare
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: 'financialtools'
+          directory: './dist'
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,88 @@
+{
+    "rates": {
+        "2023-24": [
+            {
+                "from_range": 0,
+                "to_range": 18200,
+                "base": 0,
+                "c": 0,
+                "over": 0
+            },
+            {
+                "from_range": 18201,
+                "to_range": 45000,
+                "base": 0,
+                "c": 0.19,
+                "over": 18200
+            },
+            {
+                "from_range": 45001,
+                "to_range": 120000,
+                "base": 5092,
+                "c": 0.325,
+                "over": 45000
+            },
+            {
+                "from_range": 120001,
+                "to_range": 180000,
+                "base": 29467,
+                "c": 0.37,
+                "over": 120000
+            },
+            {
+                "from_range": 180001,
+                "to_range": -1,
+                "base": 51667,
+                "c": 0.45,
+                "over": 180000
+            }
+        ],
+        "2024-25": [
+            {
+                "from_range": 0,
+                "to_range": 18200,
+                "base": 0,
+                "c": 0,
+                "over": 0
+            },
+            {
+                "from_range": 18201,
+                "to_range": 45000,
+                "base": 0,
+                "c": 0.16,
+                "over": 18200
+            },
+            {
+                "from_range": 45001,
+                "to_range": 135000,
+                "base": 4288,
+                "c": 0.3,
+                "over": 45000
+            },
+            {
+                "from_range": 135001,
+                "to_range": 189999,
+                "base": 31288,
+                "c": 0.37,
+                "over": 135000
+            },
+            {
+                "from_range": 190000,
+                "to_range": 999999999999,
+                "base": 51638,
+                "c": 0.45,
+                "over": 190000
+            }
+        ]
+    },
+    "lookup" : {
+        "2023-24" : {
+            "medicare_levy" : 0.02,
+            "super" : 0.1115
+        },
+        "2024-25" : {
+            "medicare_levy" : 0.02,
+            "super" : 0.12
+        }
+    }
+}

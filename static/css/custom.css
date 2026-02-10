@@ -1,0 +1,27 @@
+/* Custom styles for Finance Tools */
+
+/* Ensure tables are scrollable on small screens */
+.table-responsive {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+/* Make amortization tables more readable */
+.table-sm td, .table-sm th {
+  padding: 0.5rem;
+}
+
+/* Results section styling */
+.results-section {
+  margin-top: 2rem;
+}
+
+/* Card styling for results */
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* Alert styling */
+.alert {
+  border-radius: 0.375rem;
+}

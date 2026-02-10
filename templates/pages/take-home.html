@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Take Home Pay Calculator - Finance Tools{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 col-xl-10 mx-auto">
+        <h2 class="text-center mb-4">Take Home Pay Calculator</h2>
+
+        <div class="card border-primary shadow-sm">
+            <div class="card-body bg-light">
+                <h5 class="card-title text-primary mb-3">Salary Details</h5>
+                <form id="takeHomeForm">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Payment Frequency *</label>
+                                <select id="paymentFrequency" class="form-select form-select-lg">
+                                    <option value="monthly">Monthly</option>
+                                    <option value="weekly">Weekly</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Annual Salary ($) *</label>
+                                <input type="number" id="annualSalary" class="form-control form-control-lg"
+                                       placeholder="e.g., 75,000">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Tax Year *</label>
+                                <select id="taxYear" class="form-select form-select-lg">
+                                    {% for year in tax_data.rates.keys()|sort(reverse=True) %}
+                                    <option value="{{ year }}">{{ year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Does salary include superannuation? *</label>
+                                <select id="includesSuper" class="form-select form-select-lg">
+                                    <option value="no">No - Salary excludes super</option>
+                                    <option value="yes">Yes - Salary includes super</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Pay Medicare Levy? *</label>
+                                <select id="medicareLevy" class="form-select form-select-lg">
+                                    <option value="yes">Yes - Standard rate</option>
+                                    <option value="no">No - Exempt</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">
+                                    Salary Sacrifice to Super (%)
+                                    <small class="text-muted ms-2">Optional - Additional voluntary super contribution</small>
+                                </label>
+                                <input type="number" id="salarySacrifice" class="form-control form-control-lg"
+                                       value="0" placeholder="e.g., 5" min="0" max="100" step="0.5">
+                                <small class="form-text text-muted">
+                                    Enter the percentage of your gross salary to sacrifice into super. This reduces your taxable income.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-calculator"></i> Calculate Take Home Pay
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Container (populated by JavaScript) -->
+        <div id="resultsContainer"></div>
+    </div>
+</div>
+
+<!-- Inject tax data for JavaScript -->
+<script>
+window.TAX_DATA = {{ tax_data|tojson }};
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/calculators/takehome.js"></script>
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block title %}Finance Tools - Home{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <h1 class="text-center mb-4">Finance Tools</h1>
+
+        <div class="alert alert-warning" role="alert">
+            <strong>Disclaimer:</strong> This is general advice, and particular circumstances may alter the results.
+            Please consult with a financial advisor for personalized advice.
+        </div>
+
+        <div class="mt-5">
+            <h3 class="mb-4">Available Finance Tools</h3>
+
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Tool</th>
+                            <th>Description</th>
+                            <th>Key Features</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <strong>Loan Calculator</strong>
+                                <br/>
+                                <small class="text-muted">Loan Payment Analysis</small>
+                            </td>
+                            <td>
+                                Calculate your loan repayments, total interest, and view detailed amortization schedules for any loan type.
+                            </td>
+                            <td>
+                                <ul class="mb-0 ps-3">
+                                    <li>Monthly/Weekly payments</li>
+                                    <li>Amortization tables</li>
+                                    <li>Extra payment impact</li>
+                                    <li>Interest savings analysis</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <a href="/loan-calculator.html" class="btn btn-primary">
+                                    <i class="bi bi-calculator"></i> Calculate
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Borrowing Capacity Calculator</strong>
+                                <br/>
+                                <small class="text-muted">Maximum Loan Amount</small>
+                            </td>
+                            <td>
+                                Determine the maximum loan amount you could potentially borrow based on your payment capacity.
+                            </td>
+                            <td>
+                                <ul class="mb-0 ps-3">
+                                    <li>Payment-based analysis</li>
+                                    <li>Multiple term options</li>
+                                    <li>Interest comparison</li>
+                                    <li>Indicative results</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <a href="/borrowing-capacity.html" class="btn btn-primary">
+                                    <i class="bi bi-calculator"></i> Calculate
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Refinance Calculator</strong>
+                                <br/>
+                                <small class="text-muted">Loan Comparison Tool</small>
+                            </td>
+                            <td>
+                                Compare your current loan with potential refinance options to identify potential savings.
+                            </td>
+                            <td>
+                                <ul class="mb-0 ps-3">
+                                    <li>Side-by-side comparison</li>
+                                    <li>Interest savings analysis</li>
+                                    <li>Payment difference tracking</li>
+                                    <li>Total cost evaluation</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <a href="/refinance.html" class="btn btn-primary">
+                                    <i class="bi bi-calculator"></i> Calculate
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Buy vs Rent Calculator</strong>
+                                <br/>
+                                <small class="text-muted">Long-term Housing Decision</small>
+                            </td>
+                            <td>
+                                Compare the true cost of buying versus renting over time, including wealth accumulation and investment strategies.
+                            </td>
+                            <td>
+                                <ul class="mb-0 ps-3">
+                                    <li>30-year comparison analysis</li>
+                                    <li>Investment portfolio modeling</li>
+                                    <li>CPI-adjusted valuations</li>
+                                    <li>Interactive charts & graphs</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <a href="/buy-vs-rent.html" class="btn btn-primary">
+                                    <i class="bi bi-calculator"></i> Calculate
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Take Home Pay Calculator</strong>
+                                <br/>
+                                <small class="text-muted">Salary & Tax Analysis</small>
+                            </td>
+                            <td>
+                                Calculate your take-home pay after tax, superannuation, and Medicare levy based on Australian tax rates.
+                            </td>
+                            <td>
+                                <ul class="mb-0 ps-3">
+                                    <li>Australian tax brackets</li>
+                                    <li>Superannuation calculations</li>
+                                    <li>Medicare levy inclusion</li>
+                                    <li>Multiple tax year support</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <a href="/take-home.html" class="btn btn-primary">
+                                    <i class="bi bi-calculator"></i> Calculate
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Simple Investment Calculator</strong>
+                                <br/>
+                                <small class="text-muted">Growth & Compound Interest</small>
+                            </td>
+                            <td>
+                                Calculate your investment growth with compound interest based on regular monthly contributions.
+                            </td>
+                            <td>
+                                <ul class="mb-0 ps-3">
+                                    <li>Monthly contribution planning</li>
+                                    <li>Compound interest calculations</li>
+                                    <li>Simple vs compound comparison</li>
+                                    <li>Long-term growth projections</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <a href="/simple-investment.html" class="btn btn-primary">
+                                    <i class="bi bi-graph-up-arrow"></i> Calculate
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Investment Options Calculator</strong>
+                                <br/>
+                                <small class="text-muted">Compare Investment Strategies</small>
+                            </td>
+                            <td>
+                                Compare different investment options including savings accounts, ETFs, and superannuation to see which strategy works best.
+                            </td>
+                            <td>
+                                <ul class="mb-0 ps-3">
+                                    <li>Multiple investment types</li>
+                                    <li>Side-by-side comparison</li>
+                                    <li>Returns analysis</li>
+                                    <li>Best option recommendation</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <a href="/investment-options.html" class="btn btn-primary">
+                                    <i class="bi bi-graph-up-arrow"></i> Calculate
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="alert alert-light mt-4">
+                <small class="text-muted">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Quick Tip:</strong> All calculators support both monthly and weekly payment frequencies.
+                    Start with any tool that matches your current financial planning needs.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

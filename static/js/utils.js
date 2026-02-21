@@ -93,6 +93,121 @@ const FinanceUtils = {
     const parsed = parseFloat(num);
     if (isNaN(parsed)) return '0%';
     return parsed.toFixed(decimals) + '%';
+  },
+
+  /**
+   * URL Parameter & Sharing Functions
+   */
+
+  /**
+   * Load form values from URL parameters
+   * @param {Array<string>} fieldIds - Array of form field IDs to populate
+   */
+  loadFromUrlParams(fieldIds) {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    fieldIds.forEach(fieldId => {
+      const element = document.getElementById(fieldId);
+      if (!element) return;
+
+      const value = urlParams.get(fieldId);
+      if (value !== null) {
+        element.value = value;
+      }
+    });
+  },
+
+  /**
+   * Generate a shareable URL with current form field values
+   * @param {Array<string>} fieldIds - Array of form field IDs to include
+   * @returns {string} URL with query parameters
+   */
+  generateShareUrl(fieldIds) {
+    const params = new URLSearchParams();
+
+    fieldIds.forEach(fieldId => {
+      const element = document.getElementById(fieldId);
+      if (!element) return;
+
+      const value = element.value;
+      if (value !== null && value !== '') {
+        params.set(fieldId, value);
+      }
+    });
+
+    const baseUrl = window.location.origin + window.location.pathname;
+    const queryString = params.toString();
+
+    return queryString ? `${baseUrl}?${queryString}` : baseUrl;
+  },
+
+  /**
+   * Copy text to clipboard
+   * @param {string} text - Text to copy
+   * @returns {Promise<boolean>} True if successful, false otherwise
+   */
+  async copyToClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+
+      try {
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        return true;
+      } catch (e) {
+        document.body.removeChild(textArea);
+        return false;
+      }
+    }
+  },
+
+  /**
+   * Setup share button functionality
+   * @param {Array<string>} fieldIds - Array of form field IDs to include in share URL
+   * @param {string} buttonId - ID of the share button element
+   */
+  setupShareButton(fieldIds, buttonId) {
+    const shareButton = document.getElementById(buttonId);
+    if (!shareButton) {
+      console.warn(`Share button with ID '${buttonId}' not found`);
+      return;
+    }
+
+    shareButton.addEventListener('click', async () => {
+      const shareUrl = FinanceUtils.generateShareUrl(fieldIds);
+      const success = await FinanceUtils.copyToClipboard(shareUrl);
+
+      // Show feedback
+      const originalHtml = shareButton.innerHTML;
+      if (success) {
+        shareButton.innerHTML = '<i class="bi bi-check-circle"></i> Copied!';
+        shareButton.classList.remove('btn-outline-primary');
+        shareButton.classList.add('btn-success');
+
+        setTimeout(() => {
+          shareButton.innerHTML = originalHtml;
+          shareButton.classList.remove('btn-success');
+          shareButton.classList.add('btn-outline-primary');
+        }, 2000);
+      } else {
+        shareButton.innerHTML = '<i class="bi bi-x-circle"></i> Failed';
+        shareButton.classList.add('btn-danger');
+
+        setTimeout(() => {
+          shareButton.innerHTML = originalHtml;
+          shareButton.classList.remove('btn-danger');
+        }, 2000);
+      }
+    });
   }
 };
 

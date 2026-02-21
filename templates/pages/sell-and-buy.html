@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Sell and Buy Another Calculator - Finance Tools{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 col-lg-10 col-xl-8 mx-auto">
+        <h2 class="text-center mb-4">Sell and Buy Another Calculator</h2>
+
+        <!-- Selling and Buying Sections Side-by-Side -->
+        <div class="row mb-4">
+            <!-- Selling Section -->
+            <div class="col-12 col-lg-6 mb-4 mb-lg-0">
+                <div class="card border-danger shadow-sm h-100">
+                    <div class="card-body bg-light">
+                        <h5 class="card-title text-danger mb-3"><i class="bi bi-house-dash"></i> Selling Your Property</h5>
+                        <form id="sellingForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Sale Price ($) *</label>
+                                <input type="number" id="salePrice" class="form-control form-control-lg"
+                                       placeholder="e.g., 800000">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Outstanding Loan ($) *</label>
+                                <input type="number" id="outstandingLoan" class="form-control form-control-lg"
+                                       placeholder="e.g., 450000">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Agent Commission (%) *</label>
+                                <input type="number" id="agentCommission" step="0.01" min="0" max="100" class="form-control form-control-lg"
+                                       placeholder="e.g., 2.5" value="2.5">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Conveyancer Costs ($)</label>
+                                <input type="number" id="sellingConveyancerCosts" step="0.01" min="0" class="form-control form-control-lg"
+                                       placeholder="e.g., 1500" value="1500">
+                                <small class="text-muted">Typical range: $1,000 - $2,000</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Current Monthly Repayment ($)</label>
+                                <input type="number" id="currentRepayment" step="0.01" min="0" class="form-control form-control-lg"
+                                       placeholder="e.g., 2500">
+                                <small class="text-muted">Optional: Your current monthly loan repayment</small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buying Section -->
+            <div class="col-12 col-lg-6">
+                <div class="card border-success shadow-sm h-100">
+                    <div class="card-body bg-light">
+                        <h5 class="card-title text-success mb-3"><i class="bi bi-house-add"></i> Buying Your New Property</h5>
+                        <form id="buyingForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Purchase Price ($) *</label>
+                                <input type="number" id="purchasePrice" class="form-control form-control-lg"
+                                       placeholder="e.g., 950000">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Interest Rate (%) *</label>
+                                <input type="number" id="interestRate" step="0.01" min="0" max="100" class="form-control form-control-lg"
+                                       placeholder="e.g., 6.5">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Loan Term (years) *</label>
+                                <input type="number" id="loanTerm" class="form-control form-control-lg"
+                                       placeholder="e.g., 30" value="30">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">State *</label>
+                                <select id="state" class="form-select form-select-lg">
+                                    <option value="NSW">New South Wales</option>
+                                    <option value="VIC">Victoria</option>
+                                    <option value="QLD">Queensland</option>
+                                    <option value="SA">South Australia</option>
+                                    <option value="WA">Western Australia</option>
+                                    <option value="TAS">Tasmania</option>
+                                    <option value="ACT">Australian Capital Territory</option>
+                                    <option value="NT">Northern Territory</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Conveyancer Costs ($)</label>
+                                <input type="number" id="buyingConveyancerCosts" step="0.01" min="0" class="form-control form-control-lg"
+                                       placeholder="e.g., 2000" value="2000">
+                                <small class="text-muted">Typical range: $1,500 - $3,000</small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calculate Button -->
+        <div class="d-grid gap-2 mb-4">
+            <button type="submit" form="buyingForm" class="btn btn-primary btn-lg">
+                <i class="bi bi-calculator"></i> Calculate
+            </button>
+        </div>
+
+        <!-- Share Button -->
+        <div class="card border-info shadow-sm mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1"><i class="bi bi-share"></i> Share This Calculation</h6>
+                        <small class="text-muted">Generate a link with your current values to share or bookmark</small>
+                    </div>
+                    <button id="shareButton" class="btn btn-outline-primary">
+                        <i class="bi bi-link-45deg"></i> Copy Link
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Container (populated by JavaScript) -->
+        <div id="resultsContainer"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/calculators/sell-and-buy.js"></script>
+{% endblock %}

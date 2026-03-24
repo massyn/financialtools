@@ -77,20 +77,38 @@ class RepayEarlierCalculator {
            (Math.pow(1 + monthlyRate, totalMonths) - 1);
   }
 
-  // Simulate amortisation, return { months, totalInterest }
+  // Simulate amortisation, return { months, totalInterest, yearlySchedule }
   simulateLoan(principal, monthlyRate, monthlyPayment) {
     let balance = principal;
     let totalInterest = 0;
     let months = 0;
-    const MAX = 1200; // 100 years safety cap
+    let yearInterest = 0;
+    let yearPrincipal = 0;
+    const MAX = 1200;
+    const yearlySchedule = [];
+
     while (balance > 0.01 && months < MAX) {
       const interest = balance * monthlyRate;
+      const principalPaid = Math.min(monthlyPayment - interest, balance);
       totalInterest += interest;
-      const principalPaid = monthlyPayment - interest;
-      balance -= principalPaid;
+      yearInterest += interest;
+      yearPrincipal += principalPaid;
+      balance = Math.max(0, balance - principalPaid);
       months++;
+
+      // Record at end of each year, or when loan finishes
+      if (months % 12 === 0 || balance <= 0.01) {
+        yearlySchedule.push({
+          year: Math.ceil(months / 12),
+          closingBalance: balance,
+          interestPaid: yearInterest,
+          principalPaid: yearPrincipal
+        });
+        yearInterest = 0;
+        yearPrincipal = 0;
+      }
     }
-    return { months, totalInterest };
+    return { months, totalInterest, yearlySchedule };
   }
 
   // Convert monthly payment/values to the display frequency
@@ -138,7 +156,9 @@ class RepayEarlierCalculator {
       monthsSaved,
       originalInterest: base.totalInterest,
       newInterest: withExtra.totalInterest,
-      interestSaved
+      interestSaved,
+      baseSchedule: base.yearlySchedule,
+      extraSchedule: withExtra.yearlySchedule
     });
   }
 
@@ -198,8 +218,50 @@ class RepayEarlierCalculator {
     return `${y} year${y !== 1 ? 's' : ''}, ${m} month${m !== 1 ? 's' : ''}`;
   }
 
+  buildScheduleRows(baseSchedule, extraSchedule) {
+    // Merge by year — base may have more years than extra (loan paid off sooner)
+    const maxYear = Math.max(
+      baseSchedule[baseSchedule.length - 1].year,
+      extraSchedule[extraSchedule.length - 1].year
+    );
+    const baseMap = Object.fromEntries(baseSchedule.map(r => [r.year, r]));
+    const extraMap = Object.fromEntries(extraSchedule.map(r => [r.year, r]));
+
+    let rows = '';
+    for (let y = 1; y <= maxYear; y++) {
+      const b = baseMap[y];
+      const e = extraMap[y];
+      const balanceDiff = b && e ? b.closingBalance - e.closingBalance : null;
+
+      const baseBalance = b ? FinanceUtils.formatCurrency(b.closingBalance) : '<span class="text-muted">—</span>';
+      const extraBalance = e
+        ? (e.closingBalance <= 0.01
+            ? '<span class="text-success fw-bold">Paid off</span>'
+            : FinanceUtils.formatCurrency(e.closingBalance))
+        : '<span class="text-success fw-bold">Paid off</span>';
+
+      const diffCell = balanceDiff !== null && balanceDiff > 0
+        ? `<span class="text-success">${FinanceUtils.formatCurrency(balanceDiff)} ahead</span>`
+        : (e && e.closingBalance <= 0.01 && b && b.closingBalance > 0.01
+            ? `<span class="text-success fw-bold">Done!</span>`
+            : '—');
+
+      const rowClass = e && e.closingBalance <= 0.01 ? 'table-success' : '';
+
+      rows += `
+        <tr class="${rowClass}">
+          <td class="text-center">Year ${y}</td>
+          <td class="text-center">${baseBalance}</td>
+          <td class="text-center">${extraBalance}</td>
+          <td class="text-center">${diffCell}</td>
+        </tr>`;
+    }
+    return rows;
+  }
+
   displayExtraResults(r) {
     const freqLabel = r.frequency === 'weekly' ? 'Weekly' : 'Monthly';
+    const scheduleRows = this.buildScheduleRows(r.baseSchedule, r.extraSchedule);
 
     const html = `
       <div class="mt-4">
@@ -239,7 +301,7 @@ class RepayEarlierCalculator {
               </div>
             </div>
 
-            <div class="table-responsive">
+            <div class="table-responsive mb-4">
               <table class="table table-striped">
                 <thead class="table-light">
                   <tr>
@@ -268,6 +330,23 @@ class RepayEarlierCalculator {
                     <td class="text-center">${FinanceUtils.formatCurrency(r.newInterest)}</td>
                     <td class="text-center text-success fw-bold">${FinanceUtils.formatCurrency(r.interestSaved)} saved</td>
                   </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h6 class="fw-bold mb-2">Year-by-Year Balance</h6>
+            <div class="table-responsive">
+              <table class="table table-sm table-bordered table-hover">
+                <thead class="table-dark">
+                  <tr>
+                    <th class="text-center">Year</th>
+                    <th class="text-center">Standard Balance</th>
+                    <th class="text-center">With Extra Repayments</th>
+                    <th class="text-center">Difference</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${scheduleRows}
                 </tbody>
               </table>
             </div>

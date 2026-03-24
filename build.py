@@ -100,6 +100,7 @@ def build():
         ('refinance.html', 'refinance.html', {}),
         ('buy-vs-rent.html', 'buy-vs-rent.html', {}),
         ('sell-and-buy.html', 'sell-and-buy.html', {}),
+        ('repay-earlier.html', 'repay-earlier.html', {}),
         ('take-home.html', 'take-home.html', {'tax_data': tax_data}),
         ('simple-investment.html', 'simple-investment.html', {}),
         ('investment-options.html', 'investment-options.html', {}),

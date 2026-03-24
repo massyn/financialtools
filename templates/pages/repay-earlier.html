@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Repay Earlier Calculator - Finance Tools{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 col-xl-10 mx-auto">
+        <h2 class="text-center mb-4">Repay Earlier Calculator</h2>
+
+        <!-- Loan Details -->
+        <div class="card border-primary shadow-sm mb-4">
+            <div class="card-body bg-light">
+                <h5 class="card-title text-primary mb-3">Loan Details</h5>
+                <form id="loanDetailsForm" novalidate>
+                    <div class="row">
+                        <div class="col-12 col-lg-3">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Loan Amount ($) *</label>
+                                <input type="number" id="loanAmount" class="form-control form-control-lg"
+                                       placeholder="e.g., 500,000">
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-3">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Interest Rate (%) *</label>
+                                <input type="number" id="interestRate" step="0.01" class="form-control form-control-lg"
+                                       placeholder="e.g., 6.5">
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-3">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Loan Term (years) *</label>
+                                <input type="number" id="loanTerm" class="form-control form-control-lg"
+                                       placeholder="e.g., 30">
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-3">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Payment Frequency</label>
+                                <select id="paymentFrequency" class="form-select form-select-lg">
+                                    <option value="monthly">Monthly</option>
+                                    <option value="weekly">Weekly</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Approach Tabs -->
+        <ul class="nav nav-tabs mb-0" id="approachTabs">
+            <li class="nav-item">
+                <button id="tab-extra" class="nav-link active fs-6 px-4" type="button">
+                    <i class="bi bi-plus-circle"></i> Extra Repayments
+                </button>
+            </li>
+            <li class="nav-item">
+                <button id="tab-target" class="nav-link fs-6 px-4" type="button">
+                    <i class="bi bi-flag"></i> Target Finish Date
+                </button>
+            </li>
+        </ul>
+
+        <!-- Extra Repayments Panel -->
+        <div id="panel-extra" class="card border-top-0 shadow-sm rounded-0 rounded-bottom">
+            <div class="card-body">
+                <p class="text-muted mb-3">
+                    Enter how much extra you can contribute each period on top of your regular repayment.
+                    We'll show you how many years you save and how much interest you avoid.
+                </p>
+                <form id="extraForm" novalidate>
+                    <div class="row align-items-end">
+                        <div class="col-12 col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark" id="extraPaymentLabel">
+                                    Extra Monthly Payment ($) *
+                                </label>
+                                <input type="number" id="extraPayment" class="form-control form-control-lg"
+                                       placeholder="e.g., 500">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="mb-3">
+                                <button type="button" id="calcExtraBtn" class="btn btn-success btn-lg w-100">
+                                    <i class="bi bi-calculator"></i> Calculate Savings
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Target Finish Date Panel -->
+        <div id="panel-target" class="card border-top-0 shadow-sm rounded-0 rounded-bottom d-none">
+            <div class="card-body">
+                <p class="text-muted mb-3">
+                    Set a goal for when you want to be debt-free. We'll tell you exactly how much extra
+                    you need to contribute each period to hit that target.
+                </p>
+                <form id="targetForm" novalidate>
+                    <div class="row align-items-end">
+                        <div class="col-12 col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Pay Off In (years) *</label>
+                                <input type="number" id="targetYears" class="form-control form-control-lg"
+                                       placeholder="e.g., 20">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="mb-3">
+                                <button type="button" id="calcTargetBtn" class="btn btn-primary btn-lg w-100">
+                                    <i class="bi bi-calculator"></i> Calculate Extra Needed
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div id="resultsContainer"></div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/calculators/repay-earlier.js"></script>
+<script>
+  // Update extra payment label when frequency changes
+  document.getElementById('paymentFrequency').addEventListener('change', function() {
+    const lbl = this.value === 'weekly' ? 'Extra Weekly Payment ($) *' : 'Extra Monthly Payment ($) *';
+    document.getElementById('extraPaymentLabel').textContent = lbl;
+  });
+</script>
+{% endblock %}

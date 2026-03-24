@@ -1,49 +1,55 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/index.html">
-            <i class="bi bi-calculator"></i> Finance Tools
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <a href="/index.html">
+            <i class="bi bi-calculator"></i>
+            <span>Finance Tools</span>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <!-- Loans Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="loansDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-house-door"></i> Loans
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="loansDropdown">
-                        <li><a class="dropdown-item" href="/loan-calculator.html">Loan Calculator</a></li>
-                        <li><a class="dropdown-item" href="/borrowing-capacity.html">Borrowing Capacity</a></li>
-                        <li><a class="dropdown-item" href="/refinance.html">Refinance Calculator</a></li>
-                        <li><a class="dropdown-item" href="/buy-vs-rent.html">Buy vs Rent</a></li>
-                        <li><a class="dropdown-item" href="/sell-and-buy.html">Sell and Buy Another</a></li>
-                        <li><a class="dropdown-item" href="/repay-earlier.html">Repay Earlier</a></li>
-                    </ul>
-                </li>
-
-                <!-- Salary Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="salaryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-currency-dollar"></i> Salary
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="salaryDropdown">
-                        <li><a class="dropdown-item" href="/take-home.html">Take Home Pay</a></li>
-                    </ul>
-                </li>
-
-                <!-- Investment Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="investmentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-graph-up-arrow"></i> Investment
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="investmentDropdown">
-                        <li><a class="dropdown-item" href="/simple-investment.html">Simple Investment</a></li>
-                        <li><a class="dropdown-item" href="/investment-options.html">Investment Options</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
     </div>
-</nav>
+
+    <nav class="sidebar-nav">
+        <!-- Loans -->
+        <div class="sidebar-section-label">Loans</div>
+        <a class="nav-link" href="/loan-calculator.html">
+            <i class="bi bi-cash-coin"></i>
+            <span>Loan Calculator</span>
+        </a>
+        <a class="nav-link" href="/borrowing-capacity.html">
+            <i class="bi bi-bank"></i>
+            <span>Borrowing Capacity</span>
+        </a>
+        <a class="nav-link" href="/refinance.html">
+            <i class="bi bi-arrow-repeat"></i>
+            <span>Refinance</span>
+        </a>
+        <a class="nav-link" href="/buy-vs-rent.html">
+            <i class="bi bi-house-door"></i>
+            <span>Buy vs Rent</span>
+        </a>
+        <a class="nav-link" href="/sell-and-buy.html">
+            <i class="bi bi-arrow-left-right"></i>
+            <span>Sell and Buy</span>
+        </a>
+        <a class="nav-link" href="/repay-earlier.html">
+            <i class="bi bi-fast-forward"></i>
+            <span>Repay Earlier</span>
+        </a>
+
+        <!-- Salary -->
+        <div class="sidebar-section-label">Salary</div>
+        <a class="nav-link" href="/take-home.html">
+            <i class="bi bi-currency-dollar"></i>
+            <span>Take Home Pay</span>
+        </a>
+
+        <!-- Investment -->
+        <div class="sidebar-section-label">Investment</div>
+        <a class="nav-link" href="/simple-investment.html">
+            <i class="bi bi-piggy-bank"></i>
+            <span>Simple Investment</span>
+        </a>
+        <a class="nav-link" href="/investment-options.html">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span>Investment Options</span>
+        </a>
+    </nav>
+</aside>

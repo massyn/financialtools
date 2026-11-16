@@ -12,6 +12,7 @@ class RepayEarlierCalculator {
     this.panel2 = document.getElementById('panel-target');
     this.calcExtraBtn = document.getElementById('calcExtraBtn');
     this.calcTargetBtn = document.getElementById('calcTargetBtn');
+    this.loanDetailsSection = document.getElementById('loanDetailsSection');
     this.resultsContainer = document.getElementById('resultsContainer');
 
     this.activeTab = 'extra';
@@ -23,6 +24,18 @@ class RepayEarlierCalculator {
     this.tab2Btn.addEventListener('click', () => this.switchTab('target'));
     this.calcExtraBtn.addEventListener('click', () => this.calculateExtra());
     this.calcTargetBtn.addEventListener('click', () => this.calculateTarget());
+
+    // Thousand-separate the money fields as the user types
+    FinanceUtils.attachThousandsSeparator(document.getElementById('loanAmount'));
+    FinanceUtils.attachThousandsSeparator(document.getElementById('extraPayment'));
+  }
+
+  /**
+   * Collapse the loan details once results are shown so they take focus; the
+   * header reopens them. The extra/target panel stays open to recalculate.
+   */
+  collapseLoanDetails() {
+    bootstrap.Collapse.getOrCreateInstance(this.loanDetailsSection).hide();
   }
 
   switchTab(tab) {
@@ -44,7 +57,7 @@ class RepayEarlierCalculator {
 
   getLoanDetails() {
     return {
-      principal: parseFloat(document.getElementById('loanAmount').value),
+      principal: FinanceUtils.parseAmount(document.getElementById('loanAmount').value),
       annualRate: parseFloat(document.getElementById('interestRate').value),
       termYears: parseFloat(document.getElementById('loanTerm').value),
       frequency: document.getElementById('paymentFrequency').value
@@ -124,7 +137,7 @@ class RepayEarlierCalculator {
     if (!this.validateLoanDetails(d)) return;
 
     const extraPerPeriodEl = document.getElementById('extraPayment');
-    const extraPerPeriod = parseFloat(extraPerPeriodEl.value);
+    const extraPerPeriod = FinanceUtils.parseAmount(extraPerPeriodEl.value);
     if (!extraPerPeriod || extraPerPeriod <= 0 || isNaN(extraPerPeriod)) {
       FinanceUtils.setValidation(extraPerPeriodEl, false, 'Extra repayment amount is required');
       return;
@@ -160,6 +173,7 @@ class RepayEarlierCalculator {
       baseSchedule: base.yearlySchedule,
       extraSchedule: withExtra.yearlySchedule
     });
+    this.collapseLoanDetails();
   }
 
   calculateTarget() {
@@ -209,6 +223,7 @@ class RepayEarlierCalculator {
       targetInterest: target.totalInterest,
       interestSaved
     });
+    this.collapseLoanDetails();
   }
 
   formatMonths(months) {

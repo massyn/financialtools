@@ -1,5 +1,5 @@
 /**
- * Loan Calculator
+ * Loan Repayment Calculator
  * Calculates loan payments, amortization schedules, and extra payment impacts
  */
 
@@ -98,8 +98,11 @@ class LoanCalculator {
     const monthlyPayment = (principal * monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) /
                           (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
 
+    // The schedule runs monthly. The extra payment is entered per selected
+    // period, so convert a weekly extra to its monthly equivalent (x 52 / 12).
     const displayPayment = isWeekly ? monthlyPayment / (52/12) : monthlyPayment;
-    const displayExtra = isWeekly ? extra / (52/12) : extra;
+    const displayExtra = extra;
+    const monthlyExtra = isWeekly ? extra * (52/12) : extra;
 
     // Calculate totals
     const totalAmount = monthlyPayment * numberOfPayments;
@@ -115,7 +118,7 @@ class LoanCalculator {
         monthlyRate,
         monthlyPayment,
         numberOfPayments,
-        extra,
+        monthlyExtra,
         totalInterest,
         displayExtra,
         isWeekly

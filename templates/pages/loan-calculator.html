@@ -9,52 +9,55 @@
 
         <div class="card border-primary shadow-sm">
             <div class="card-body bg-light">
-                <h5 class="card-title text-primary mb-3">Loan Details</h5>
-                <form id="loanForm">
+                <button type="button" class="collapse-toggle btn btn-link p-0 w-100 d-flex justify-content-between align-items-center text-decoration-none"
+                        data-bs-toggle="collapse" data-bs-target="#loanDetails"
+                        aria-expanded="true" aria-controls="loanDetails">
+                    <h5 class="card-title text-primary mb-0">Loan Details</h5>
+                    <i class="bi bi-chevron-up text-primary"></i>
+                </button>
+                <div id="loanDetails" class="collapse show">
+                <form id="loanForm" class="mt-3">
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-12 col-md-4">
                             <div class="mb-3">
-                                <label class="form-label fw-bold text-dark">Payment Frequency *</label>
+                                <label class="form-label fw-bold text-dark" for="loanAmount">Loan Amount ($) *</label>
+                                <input type="text" inputmode="numeric" id="loanAmount" class="form-control form-control-lg"
+                                       placeholder="e.g., 500,000" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark" for="interestRate">Interest Rate (%) *</label>
+                                <input type="number" id="interestRate" step="0.01" class="form-control form-control-lg"
+                                       placeholder="e.g., 5.5">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark" for="loanTerm">Loan Term (years) *</label>
+                                <input type="number" id="loanTerm" class="form-control form-control-lg"
+                                       placeholder="e.g., 30">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark" for="paymentFrequency">Payment Frequency *</label>
                                 <select id="paymentFrequency" class="form-select form-select-lg">
                                     <option value="monthly">Monthly</option>
                                     <option value="weekly">Weekly</option>
                                 </select>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
                         <div class="col-12 col-md-6">
                             <div class="mb-3">
-                                <label class="form-label fw-bold text-dark">Loan Amount ($) *</label>
-                                <input type="number" id="loanAmount" class="form-control form-control-lg"
-                                       placeholder="e.g., 500000">
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold text-dark">Interest Rate (%) *</label>
-                                <input type="number" id="interestRate" step="0.01" class="form-control form-control-lg"
-                                       placeholder="e.g., 5.5">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12 col-sm-6">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold text-dark">Loan Term (years) *</label>
-                                <input type="number" id="loanTerm" class="form-control form-control-lg"
-                                       placeholder="e.g., 30">
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold text-secondary" id="extraPaymentLabel">
+                                <label class="form-label fw-bold text-secondary" for="extraPayment" id="extraPaymentLabel">
                                     Extra Payment per Month ($)
                                 </label>
-                                <input type="number" id="extraPayment" class="form-control form-control-lg"
-                                       placeholder="e.g., 200">
+                                <input type="text" inputmode="numeric" id="extraPayment" class="form-control form-control-lg"
+                                       placeholder="e.g., 200" autocomplete="off">
                             </div>
                         </div>
                     </div>
@@ -65,6 +68,7 @@
                         </button>
                     </div>
                 </form>
+                </div>
             </div>
         </div>
 
@@ -75,5 +79,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.6.1/dist/chart.umd.min.js" integrity="sha384-Emf5ZVIUiarAdhkgtqK+5/Z5qIvM6QoVrS+qAVtfyZVuD5lIHrac0me485+Antp0" crossorigin="anonymous"></script>
+<script src="/static/js/calculators/loan-charts.js"></script>
 <script src="/static/js/calculators/loan.js"></script>
 {% endblock %}

@@ -14,6 +14,7 @@ class LoanCalculator {
       extraPayment: document.getElementById('extraPayment'),
       paymentFrequency: document.getElementById('paymentFrequency')
     };
+    this.formSection = document.getElementById('loanDetails');
     this.resultsContainer = document.getElementById('resultsContainer');
     this.extraPaymentLabel = document.getElementById('extraPaymentLabel');
 
@@ -25,8 +26,15 @@ class LoanCalculator {
     // Handle form submission
     this.form.addEventListener('submit', (e) => {
       e.preventDefault();
-      this.calculate();
+      if (this.calculate()) {
+        // Collapse the questions so the results take focus; the header reopens them
+        bootstrap.Collapse.getOrCreateInstance(this.formSection).hide();
+      }
     });
+
+    // Thousand-separate the money fields as the user types
+    FinanceUtils.attachThousandsSeparator(this.inputs.loanAmount);
+    FinanceUtils.attachThousandsSeparator(this.inputs.extraPayment);
 
     // Update extra payment label when frequency changes
     this.inputs.paymentFrequency.addEventListener('change', () => {
@@ -43,7 +51,7 @@ class LoanCalculator {
     let isValid = true;
 
     // Validate loan amount
-    if (!FinanceUtils.validateRequired(this.inputs.loanAmount.value)) {
+    if (!FinanceUtils.validateRequired(FinanceUtils.parseAmount(this.inputs.loanAmount.value))) {
       FinanceUtils.setValidation(this.inputs.loanAmount, false, 'Loan amount is required and must be a positive number');
       isValid = false;
     } else {
@@ -75,15 +83,15 @@ class LoanCalculator {
 
     // Validate inputs
     if (!this.validate()) {
-      return;
+      return false;
     }
 
     // Parse input values
-    const principal = parseFloat(this.inputs.loanAmount.value);
+    const principal = FinanceUtils.parseAmount(this.inputs.loanAmount.value);
     const annualRate = parseFloat(this.inputs.interestRate.value) / 100;
     const monthlyRate = annualRate / 12;
     const numberOfPayments = parseFloat(this.inputs.loanTerm.value) * 12;
-    const extra = parseFloat(this.inputs.extraPayment.value) || 0;
+    const extra = FinanceUtils.parseAmount(this.inputs.extraPayment.value) || 0;
     const isWeekly = this.inputs.paymentFrequency.value === 'weekly';
 
     // Calculate monthly payment using standard mortgage formula
@@ -126,6 +134,8 @@ class LoanCalculator {
       loanTerm: parseFloat(this.inputs.loanTerm.value),
       extraResults
     });
+
+    return true;
   }
 
   calculateAmortization(principal, monthlyRate, monthlyPayment, numberOfPayments) {
@@ -197,7 +207,7 @@ class LoanCalculator {
   }
 
   calculateSuggestion() {
-    const principal = parseFloat(this.inputs.loanAmount.value);
+    const principal = FinanceUtils.parseAmount(this.inputs.loanAmount.value);
     const annualRate = parseFloat(this.inputs.interestRate.value) / 100;
     const monthlyRate = annualRate / 12;
     const numberOfPayments = parseFloat(this.inputs.loanTerm.value) * 12;
@@ -302,6 +312,13 @@ class LoanCalculator {
                 </tbody>
               </table>
             </div>
+
+            <h6 class="mt-4">Total Cost of the Loan</h6>
+            <p class="small text-muted mb-2">What you borrowed, plus the interest you pay on it.</p>
+            <div class="mb-4" style="position: relative; height: ${results.extraResults ? 190 : 130}px;">
+              <canvas id="totalCostChart" role="img"
+                      aria-label="Bar chart of the amount borrowed and total interest for each scenario"></canvas>
+            </div>
     `;
 
     // Show suggestion if no extra payment
@@ -386,6 +403,18 @@ class LoanCalculator {
     `;
 
     this.resultsContainer.innerHTML = html;
+
+    const scenarios = [
+      { label: 'Standard loan', borrowed: results.loanAmount, interest: results.totalInterest }
+    ];
+    if (results.extraResults) {
+      scenarios.push({
+        label: 'With extra payments',
+        borrowed: results.loanAmount,
+        interest: results.extraResults.totalInterestWithExtra
+      });
+    }
+    LoanCharts.totalCost('totalCostChart', scenarios);
   }
 }
 

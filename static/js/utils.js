@@ -90,7 +90,7 @@ const FinanceUtils = {
    * @param {HTMLInputElement} input - The money input element
    */
   attachThousandsSeparator(input) {
-    input.addEventListener('input', () => {
+    const format = () => {
       const caret = input.selectionStart ?? input.value.length;
       const digitsBeforeCaret = input.value.slice(0, caret).replace(/\D/g, '').length;
       const digits = input.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
@@ -102,8 +102,14 @@ const FinanceUtils = {
       }
 
       input.value = formatted;
-      input.setSelectionRange(newCaret, newCaret);
-    });
+      if (document.activeElement === input) {
+        input.setSelectionRange(newCaret, newCaret);
+      }
+    };
+
+    input.addEventListener('input', format);
+    // Format any default value already in the field
+    if (input.value) format();
   },
 
   /**

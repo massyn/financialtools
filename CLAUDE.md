@@ -80,8 +80,8 @@ implementation. New and updated calculators follow it.
 - [x] **loan-calculator**: thousand separators on Loan Amount and Extra Payment; collapsible form;
       Total Cost, Balance Over Time and Principal vs Interest charts. Payment frequency kept as a
       question. Renamed to "Loan Repayment" (URL unchanged).
-- [ ] **borrowing-capacity**: thousand separators on the payment amount; collapsible form. Payment
-      frequency describes the input amount, so it stays a question.
+- [x] **borrowing-capacity**: thousand separators on the payment amount; collapsible form; the three
+      questions on one row. Payment frequency describes the input amount, so it stays a question.
 - [ ] **refinance**: thousand separators on Outstanding Amount and Current Payment Amount; collapsible
       form. Current payment frequency is an input, so it stays.
 - [ ] **repay-earlier**: thousand separators on Loan Amount and Extra Payment; collapse both forms

@@ -181,8 +181,9 @@ class TakeHomeCalculator {
   displayResults(results) {
     const pct = (rate) => `${parseFloat((rate * 100).toFixed(2))}%`;
 
-    const superLabel = `Super (${pct(results.superRate)})`;
-    const expenses = [[superLabel, results.superAmount]];
+    // Super is split out of the package under Income; everything else
+    // reduces base salary to take-home pay.
+    const expenses = [];
     if (results.sacrificeAmount > 0) {
       expenses.push([`Salary sacrifice (${pct(results.sacrificePercent / 100)})`, results.sacrificeAmount]);
     }
@@ -192,38 +193,44 @@ class TakeHomeCalculator {
     }
     const totalExpenses = expenses.reduce((sum, [, amount]) => sum + amount, 0);
 
-    // One Income / Expenses / Net table per tab, scaled from annual figures
+    // A ledger per tab, scaled from annual figures: itemised amounts sit in the
+    // middle column, totals in the right, so base salary - total expenses = take-home.
     const breakdownTable = (divisor) => {
       const money = (annual) => FinanceUtils.formatCurrency(annual / divisor);
+      const bold = (text) => `<strong>${text}</strong>`;
       const section = (title) => `
                   <tr class="table-light">
-                    <th colspan="2" class="text-uppercase small text-muted">${title}</th>
+                    <th colspan="3" class="text-uppercase small text-muted">${title}</th>
                   </tr>`;
-      const row = (label, annual, { bold = false, rowClass = '' } = {}) => {
-        const cell = (text) => (bold ? `<strong>${text}</strong>` : text);
-        return `
+      const item = (label, annual) => `
+                  <tr>
+                    <td class="ps-4">${label}</td>
+                    <td class="text-end">${money(annual)}</td>
+                    <td></td>
+                  </tr>`;
+      const total = (label, annual, rowClass = '') => `
                   <tr class="${rowClass}">
-                    <td>${cell(label)}</td>
-                    <td class="text-end">${cell(money(annual))}</td>
+                    <td>${bold(label)}</td>
+                    <td></td>
+                    <td class="text-end">${bold(money(annual))}</td>
                   </tr>`;
-      };
 
       return `
               <div class="table-responsive">
                 <table class="table mb-0">
                   <thead class="table-success">
-                    <tr><th>Component</th><th class="text-end">Amount</th></tr>
+                    <tr><th>Component</th><th></th><th class="text-end">Amount</th></tr>
                   </thead>
                   <tbody>
                     ${section('Income')}
-                    ${row('Base salary', results.baseSalary)}
-                    ${row(superLabel, results.superAmount)}
-                    ${row('Salary package', results.salaryPackage, { bold: true })}
+                    ${total('Salary package', results.salaryPackage)}
+                    ${item(`Super (${pct(results.superRate)})`, results.superAmount)}
+                    ${total('Base salary', results.baseSalary)}
                     ${section('Expenses')}
-                    ${expenses.map(([label, amount]) => row(label, amount)).join('')}
-                    ${row('Total expenses', totalExpenses, { bold: true })}
+                    ${expenses.map(([label, amount]) => item(label, amount)).join('')}
+                    ${total('Total expenses', totalExpenses)}
                     ${section('Net')}
-                    ${row('Take-home pay', results.takeHomeAnnual, { bold: true, rowClass: 'table-success' })}
+                    ${total('Take-home pay', results.takeHomeAnnual, 'table-success')}
                   </tbody>
                 </table>
               </div>`;

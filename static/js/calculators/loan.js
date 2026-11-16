@@ -346,7 +346,26 @@ class LoanCalculator {
       `;
     }
 
+    const splitScenario = results.extraResults ? 'with your extra payments' : 'for the standard loan';
     html += `
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <h5>Loan Balance Over Time</h5>
+            <p class="small text-muted mb-2">How much you still owe at the end of each year.</p>
+            <div class="mb-4" style="position: relative; height: 300px;">
+              <canvas id="balanceChart" role="img"
+                      aria-label="Line chart of the loan balance at the end of each year"></canvas>
+            </div>
+
+            <h5>Principal vs Interest Each Year</h5>
+            <p class="small text-muted mb-2">How each year's repayments split between paying down the loan and interest, ${splitScenario}.</p>
+            <div style="position: relative; height: 300px;">
+              <canvas id="yearlySplitChart" role="img"
+                      aria-label="Stacked bar chart of principal and interest paid in each year"></canvas>
+            </div>
           </div>
         </div>
 
@@ -418,6 +437,21 @@ class LoanCalculator {
       });
     }
     LoanCharts.totalCost('totalCostChart', scenarios);
+
+    const balanceScenarios = [
+      { label: 'Standard loan', colour: LoanCharts.colours.standard, schedule: results.amortizationSchedule }
+    ];
+    if (results.extraResults) {
+      balanceScenarios.push({
+        label: 'With extra payments',
+        colour: LoanCharts.colours.withExtra,
+        schedule: results.extraResults.extraAmortizationSchedule
+      });
+    }
+    LoanCharts.balanceOverTime('balanceChart', results.loanAmount, results.loanTerm, balanceScenarios);
+
+    LoanCharts.yearlySplit('yearlySplitChart',
+      results.extraResults ? results.extraResults.extraAmortizationSchedule : results.amortizationSchedule);
   }
 }
 

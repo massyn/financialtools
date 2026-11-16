@@ -436,15 +436,15 @@ class LoanCalculator {
         interest: results.extraResults.totalInterestWithExtra
       });
     }
-    LoanCharts.totalCost('totalCostChart', scenarios);
+    FinanceCharts.totalCost('totalCostChart', scenarios);
 
     const balanceScenarios = [
-      { label: 'Standard loan', colour: LoanCharts.colours.standard, schedule: results.amortizationSchedule }
+      { label: 'Standard loan', colour: FinanceCharts.colours.baseline, schedule: results.amortizationSchedule }
     ];
     if (results.extraResults) {
       balanceScenarios.push({
         label: 'With extra payments',
-        colour: LoanCharts.colours.withExtra,
+        colour: FinanceCharts.colours.alternative,
         schedule: results.extraResults.extraAmortizationSchedule
       });
     }

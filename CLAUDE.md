@@ -29,8 +29,8 @@ implementation. New and updated calculators follow it.
 
 - Money fields are `type="text" inputmode="numeric" autocomplete="off"`, not `type="number"`
   (a number input cannot show separators). Rates, percentages and years stay `type="number"`.
-- Wire each one with `FinanceUtils.attachThousandsSeparator(input)`, which reformats on `input` and keeps
-  the caret after the same digit.
+- Wire each one with `FinanceUtils.attachThousandsSeparator(input)`, which formats any default value
+  straight away, then reformats on `input` and keeps the caret after the same digit.
 - Read it with `FinanceUtils.parseAmount(input.value)` (commas stripped) before validating or
   calculating; plain `parseFloat("500,000")` returns 500.
 
@@ -82,18 +82,17 @@ implementation. New and updated calculators follow it.
       question. Renamed to "Loan Repayment" (URL unchanged).
 - [x] **borrowing-capacity**: thousand separators on the payment amount; collapsible form; the three
       questions on one row. Payment frequency describes the input amount, so it stays a question.
-- [ ] **refinance**: thousand separators on Outstanding Amount and Current Payment Amount; collapsible
-      form. Current payment frequency is an input, so it stays.
-- [ ] **repay-earlier**: thousand separators on Loan Amount and Extra Payment; collapse both forms
-      (loan details and target). Payment frequency drives the calculation, so it stays.
-- [ ] **sell-and-buy**: thousand separators on Sale Price, Outstanding Loan, Conveyancer Costs (x2),
-      Current Monthly Repayment and Purchase Price; collapse both forms.
-- [ ] **buy-vs-rent**: thousand separators on Property Price, Council Rates, Insurance, Maintenance,
-      Weekly Rent and Weekly Investment Amount; collapsible form. Review whether the investment
-      frequency question is display-only and could become tabs.
-- [ ] **simple-investment**: thousand separators on Monthly Savings Amount; collapsible form.
-- [ ] **investment-options**: thousand separators on Investment Amount; collapsible form. Review whether
-      the investment frequency question is display-only and could become tabs.
+- [x] **refinance**: thousand separators on Outstanding Amount and Payment; collapsible form; payment
+      frequency at the end of the current loan row; Monthly Repayments and Total Cost charts.
+- [x] **repay-earlier**: thousand separators on Loan Amount and Extra Payment; the Loan Details section
+      collapses after calculating (the extra/target panel stays open to recalculate).
+- [x] **sell-and-buy**: thousand separators on all six money fields; both property cards collapse
+      under one "Property Details" header, including when results load from a shared link.
+- [x] **buy-vs-rent**: thousand separators on the six money fields; "Scenario Details" collapses.
+- [x] **simple-investment**: thousand separator on Monthly Savings Amount; collapsible form.
+- [x] **investment-options**: thousand separator on Investment Amount; collapsible form.
+- [ ] **Frequency questions**: review whether the investment frequency question on buy-vs-rent and
+      investment-options only changes the display; if so, replace it with result tabs.
 - [x] **Shared helper**: thousand-separator formatting and parsing moved into `FinanceUtils`.
 - [ ] **Table height cap**: `custom.css` caps every `.table-responsive` at 500px with an inner scrollbar
       (the home page opts out with `.table-uncapped`). Decide per calculator whether long tables should

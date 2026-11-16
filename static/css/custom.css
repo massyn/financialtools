@@ -242,6 +242,12 @@ h3 { font-size: 1.05rem; font-weight: 600; }
   overflow-x: auto;
 }
 
+/* Opt out of the height cap where the whole table should flow with the page */
+.table-responsive.table-uncapped {
+  max-height: none;
+  overflow-y: visible;
+}
+
 .table-sm td, .table-sm th {
   padding: 0.5rem;
 }
@@ -276,4 +282,13 @@ h3 { font-size: 1.05rem; font-weight: 600; }
     font-size: 1rem;
     padding: 0.75rem 1rem;
   }
+}
+
+/* Collapsible form header: chevron points down when the section is collapsed */
+.collapse-toggle .bi-chevron-up {
+  transition: transform 0.2s ease;
+}
+
+.collapse-toggle.collapsed .bi-chevron-up {
+  transform: rotate(180deg);
 }

@@ -277,3 +277,12 @@ h3 { font-size: 1.05rem; font-weight: 600; }
     padding: 0.75rem 1rem;
   }
 }
+
+/* Collapsible form header: chevron points down when the section is collapsed */
+.collapse-toggle .bi-chevron-up {
+  transition: transform 0.2s ease;
+}
+
+.collapse-toggle.collapsed .bi-chevron-up {
+  transform: rotate(180deg);
+}

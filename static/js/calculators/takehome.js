@@ -121,15 +121,12 @@ class TakeHomeCalculator {
     const taxYearData = this.taxData.rates[taxYear];
     const lookupData = this.taxData.lookup[taxYear];
 
-    // Step 1: Calculate superannuation
-    let superAmount = 0;
-    let grossSalary = salary;
-
-    if (includesSuper) {
-      const superRate = lookupData.super;
-      superAmount = salary * superRate / (1 + superRate);
-      grossSalary = salary - superAmount;
-    }
+    // Step 1: Split the salary into base pay and employer super. A salary that
+    // includes super is the package; one that excludes it is the base pay.
+    const superRate = lookupData.super;
+    const grossSalary = includesSuper ? salary / (1 + superRate) : salary;
+    const superAmount = grossSalary * superRate;
+    const salaryPackage = grossSalary + superAmount;
 
     // Step 2: Calculate salary sacrifice
     const sacrificeAmount = grossSalary * (sacrificePercent / 100);
@@ -162,9 +159,9 @@ class TakeHomeCalculator {
     // Values are passed unrounded; formatCurrency rounds for display so the
     // periodic tabs are derived from exact annual figures.
     this.displayResults({
-      employerSalary: salary,
-      includesSuper,
-      superRate: lookupData.super,
+      baseSalary: grossSalary,
+      salaryPackage,
+      superRate,
       superAmount,
       sacrificePercent,
       sacrificeAmount,
@@ -184,10 +181,8 @@ class TakeHomeCalculator {
   displayResults(results) {
     const pct = (rate) => `${parseFloat((rate * 100).toFixed(2))}%`;
 
-    const expenses = [];
-    if (results.includesSuper) {
-      expenses.push([`Super (${pct(results.superRate)})`, results.superAmount]);
-    }
+    const superLabel = `Super (${pct(results.superRate)})`;
+    const expenses = [[superLabel, results.superAmount]];
     if (results.sacrificeAmount > 0) {
       expenses.push([`Salary sacrifice (${pct(results.sacrificePercent / 100)})`, results.sacrificeAmount]);
     }
@@ -196,7 +191,6 @@ class TakeHomeCalculator {
       expenses.push([`Medicare levy (${pct(results.medicareRate)})`, results.medicareAmount]);
     }
     const totalExpenses = expenses.reduce((sum, [, amount]) => sum + amount, 0);
-    const incomeLabel = results.includesSuper ? 'Salary package (incl. super)' : 'Salary';
 
     // One Income / Expenses / Net table per tab, scaled from annual figures
     const breakdownTable = (divisor) => {
@@ -219,7 +213,9 @@ class TakeHomeCalculator {
                   </thead>
                   <tbody>
                     ${section('Income')}
-                    ${row(incomeLabel, results.employerSalary)}
+                    ${row('Base salary', results.baseSalary)}
+                    ${row(superLabel, results.superAmount)}
+                    ${row('<strong>Salary package</strong>', results.salaryPackage, 'fw-bold')}
                     ${section('Expenses')}
                     ${expenses.map(([label, amount]) => row(label, amount)).join('')}
                     ${row('<strong>Total expenses</strong>', totalExpenses, 'fw-bold')}

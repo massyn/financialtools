@@ -18,8 +18,25 @@ class TakeHomeCalculator {
     this.resultsContainer = document.getElementById('resultsContainer');
     this.taxData = window.TAX_DATA;
 
+    this.selectCurrentTaxYear();
+
     // Attach event listeners
     this.attachEventListeners();
+  }
+
+  /**
+   * Default the tax year to the current Australian financial year
+   * (1 July - 30 June), e.g. "2026-27". Done in the browser rather than at
+   * build time so the default stays right without a rebuild. If the current
+   * year has no rates yet, the dropdown keeps its first (latest) option.
+   */
+  selectCurrentTaxYear() {
+    const today = new Date();
+    const startYear = today.getMonth() >= 6 ? today.getFullYear() : today.getFullYear() - 1;
+    const current = `${startYear}-${String(startYear + 1).slice(-2)}`;
+    if (this.taxData.rates[current]) {
+      this.inputs.taxYear.value = current;
+    }
   }
 
   attachEventListeners() {
@@ -74,6 +91,17 @@ class TakeHomeCalculator {
     return isValid;
   }
 
+  /**
+   * Income tax on an amount for one year's brackets. The bracket is chosen by
+   * its "over" threshold (the highest one the income exceeds), so incomes that
+   * fall between one bracket's to_range and the next's from_range, such as
+   * fractional dollars, still land in the right bracket.
+   */
+  incomeTax(income, brackets) {
+    const bracket = brackets.reduce((match, b) => (income > b.over ? b : match), brackets[0]);
+    return { tax: bracket.base + Math.max(0, income - bracket.over) * bracket.c, bracket };
+  }
+
   calculate() {
     // Clear previous validation
     FinanceUtils.clearValidation(this.form);
@@ -108,16 +136,7 @@ class TakeHomeCalculator {
     const taxableIncome = grossSalary - sacrificeAmount;
 
     // Step 3: Calculate income tax (on taxable income after salary sacrifice)
-    let incomeTax = 0;
-    const taxBracket = taxYearData.find(bracket =>
-      taxableIncome >= bracket.from_range &&
-      (bracket.to_range === -1 || bracket.to_range === 999999999999 || taxableIncome <= bracket.to_range)
-    );
-
-    if (taxBracket) {
-      const taxableOver = Math.max(0, taxableIncome - taxBracket.over);
-      incomeTax = taxBracket.base + (taxableOver * taxBracket.c);
-    }
+    const { tax: incomeTax, bracket: taxBracket } = this.incomeTax(taxableIncome, taxYearData);
 
     // Step 4: Calculate medicare levy (on taxable income after salary sacrifice)
     let medicareAmount = 0;
@@ -131,16 +150,7 @@ class TakeHomeCalculator {
 
     // Step 6: Calculate tax savings from salary sacrifice
     // Calculate what the tax would be WITHOUT salary sacrifice for comparison
-    let incomeTaxWithoutSacrifice = 0;
-    const taxBracketWithoutSacrifice = taxYearData.find(bracket =>
-      grossSalary >= bracket.from_range &&
-      (bracket.to_range === -1 || bracket.to_range === 999999999999 || grossSalary <= bracket.to_range)
-    );
-
-    if (taxBracketWithoutSacrifice) {
-      const taxableOver = Math.max(0, grossSalary - taxBracketWithoutSacrifice.over);
-      incomeTaxWithoutSacrifice = taxBracketWithoutSacrifice.base + (taxableOver * taxBracketWithoutSacrifice.c);
-    }
+    const incomeTaxWithoutSacrifice = this.incomeTax(grossSalary, taxYearData).tax;
 
     const medicareWithoutSacrifice = payMedicareLevy ? grossSalary * lookupData.medicare_levy : 0;
     const totalTaxWithoutSacrifice = incomeTaxWithoutSacrifice + medicareWithoutSacrifice;

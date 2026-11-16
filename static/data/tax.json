@@ -147,6 +147,43 @@
                 "c": 0.45,
                 "over": 190000
             }
+        ],
+        "2027-28": [
+            {
+                "from_range": 0,
+                "to_range": 18200,
+                "base": 0,
+                "c": 0,
+                "over": 0
+            },
+            {
+                "from_range": 18201,
+                "to_range": 45000,
+                "base": 0,
+                "c": 0.14,
+                "over": 18200
+            },
+            {
+                "from_range": 45001,
+                "to_range": 135000,
+                "base": 3752,
+                "c": 0.3,
+                "over": 45000
+            },
+            {
+                "from_range": 135001,
+                "to_range": 190000,
+                "base": 30752,
+                "c": 0.37,
+                "over": 135000
+            },
+            {
+                "from_range": 190001,
+                "to_range": -1,
+                "base": 51102,
+                "c": 0.45,
+                "over": 190000
+            }
         ]
     },
     "lookup" : {
@@ -163,6 +200,10 @@
             "super" : 0.12
         },
         "2026-27" : {
+            "medicare_levy" : 0.02,
+            "super" : 0.12
+        },
+        "2027-28" : {
             "medicare_levy" : 0.02,
             "super" : 0.12
         }

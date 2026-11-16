@@ -117,6 +117,16 @@ class RefinanceCalculator {
     const newMonthlyRate = newRate / 12;
     const newNumberOfPayments = newTermYears * 12;
 
+    // The current loan only pays off if the payment covers more than the interest
+    const monthlyInterest = outstandingAmount * currentMonthlyRate;
+    if (currentMonthlyPayment <= monthlyInterest) {
+      const interestPerPeriod = isCurrentWeekly ? monthlyInterest / (52/12) : monthlyInterest;
+      const period = isCurrentWeekly ? 'weekly' : 'monthly';
+      FinanceUtils.setValidation(this.inputs.currentPaymentAmount, false,
+        `Payment must be more than the ${period} interest of ${FinanceUtils.formatCurrency(Math.ceil(interestPerPeriod))}, or the loan never pays off`);
+      return false;
+    }
+
     // Calculate new loan payment
     const newMonthlyPayment = (outstandingAmount * newMonthlyRate * Math.pow(1 + newMonthlyRate, newNumberOfPayments)) /
                               (Math.pow(1 + newMonthlyRate, newNumberOfPayments) - 1);

@@ -237,9 +237,9 @@ class TakeHomeCalculator {
     };
 
     const tabs = [
+      { id: 'breakdown-annual', label: 'Annual', divisor: 1 },
       { id: 'breakdown-monthly', label: 'Monthly', divisor: 12 },
-      { id: 'breakdown-weekly', label: 'Weekly', divisor: 52 },
-      { id: 'breakdown-annual', label: 'Annual', divisor: 1 }
+      { id: 'breakdown-weekly', label: 'Weekly', divisor: 52 }
     ];
 
     let html = `

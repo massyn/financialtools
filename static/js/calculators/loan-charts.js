@@ -1,5 +1,5 @@
 /**
- * Loan Repayment Calculator charts (Chart.js)
+ * Loan Repayment charts (Chart.js)
  * Colours come from the validated categorical palette, so each pair stays
  * distinguishable for colour-blind readers. Borrowed/principal and interest
  * keep the same colours in every chart; the two scenarios get their own pair.

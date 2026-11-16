@@ -1,5 +1,5 @@
 /**
- * Loan Repayment Calculator
+ * Loan Repayment
  * Calculates loan payments, amortization schedules, and extra payment impacts
  */
 

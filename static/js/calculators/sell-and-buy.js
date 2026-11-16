@@ -20,6 +20,7 @@ class SellAndBuyCalculator {
       state: document.getElementById('state'),
       buyingConveyancerCosts: document.getElementById('buyingConveyancerCosts')
     };
+    this.formSection = document.getElementById('propertyDetails');
     this.resultsContainer = document.getElementById('resultsContainer');
 
     // Field IDs for URL sharing
@@ -79,6 +80,11 @@ class SellAndBuyCalculator {
       e.preventDefault();
       this.calculate();
     });
+
+    // Thousand-separate the money fields as the user types
+    ['salePrice', 'outstandingLoan', 'sellingConveyancerCosts', 'currentRepayment',
+      'purchasePrice', 'buyingConveyancerCosts']
+      .forEach(field => FinanceUtils.attachThousandsSeparator(this.inputs[field]));
   }
 
   validate() {
@@ -89,7 +95,7 @@ class SellAndBuyCalculator {
     forms.forEach(form => FinanceUtils.clearValidation(form));
 
     // Validate sale price
-    if (!FinanceUtils.validateRequired(this.inputs.salePrice.value)) {
+    if (!FinanceUtils.validateRequired(FinanceUtils.parseAmount(this.inputs.salePrice.value))) {
       FinanceUtils.setValidation(this.inputs.salePrice, false, 'Sale price is required');
       isValid = false;
     } else {
@@ -97,7 +103,7 @@ class SellAndBuyCalculator {
     }
 
     // Validate outstanding loan
-    if (!FinanceUtils.validateRequired(this.inputs.outstandingLoan.value)) {
+    if (!FinanceUtils.validateRequired(FinanceUtils.parseAmount(this.inputs.outstandingLoan.value))) {
       FinanceUtils.setValidation(this.inputs.outstandingLoan, false, 'Outstanding loan is required');
       isValid = false;
     } else {
@@ -113,7 +119,7 @@ class SellAndBuyCalculator {
     }
 
     // Validate purchase price
-    if (!FinanceUtils.validateRequired(this.inputs.purchasePrice.value)) {
+    if (!FinanceUtils.validateRequired(FinanceUtils.parseAmount(this.inputs.purchasePrice.value))) {
       FinanceUtils.setValidation(this.inputs.purchasePrice, false, 'Purchase price is required');
       isValid = false;
     } else {
@@ -265,15 +271,15 @@ class SellAndBuyCalculator {
   calculate() {
     // Validate inputs
     if (!this.validate()) {
-      return;
+      return false;
     }
 
     // Parse selling inputs
-    const salePrice = parseFloat(this.inputs.salePrice.value);
-    const outstandingLoan = parseFloat(this.inputs.outstandingLoan.value);
+    const salePrice = FinanceUtils.parseAmount(this.inputs.salePrice.value);
+    const outstandingLoan = FinanceUtils.parseAmount(this.inputs.outstandingLoan.value);
     const agentCommission = parseFloat(this.inputs.agentCommission.value) / 100;
-    const sellingConveyancerCosts = parseFloat(this.inputs.sellingConveyancerCosts.value) || 0;
-    const currentRepayment = parseFloat(this.inputs.currentRepayment.value) || 0;
+    const sellingConveyancerCosts = FinanceUtils.parseAmount(this.inputs.sellingConveyancerCosts.value) || 0;
+    const currentRepayment = FinanceUtils.parseAmount(this.inputs.currentRepayment.value) || 0;
 
     // Calculate selling costs
     const commissionAmount = salePrice * agentCommission;
@@ -281,11 +287,11 @@ class SellAndBuyCalculator {
     const netFromSale = salePrice - commissionAmount - sellingConveyancerCosts - outstandingLoan;
 
     // Parse buying inputs
-    const purchasePrice = parseFloat(this.inputs.purchasePrice.value);
+    const purchasePrice = FinanceUtils.parseAmount(this.inputs.purchasePrice.value);
     const interestRate = parseFloat(this.inputs.interestRate.value) / 100;
     const loanTerm = parseFloat(this.inputs.loanTerm.value);
     const state = this.inputs.state.value;
-    const buyingConveyancerCosts = parseFloat(this.inputs.buyingConveyancerCosts.value) || 0;
+    const buyingConveyancerCosts = FinanceUtils.parseAmount(this.inputs.buyingConveyancerCosts.value) || 0;
 
     // Calculate buying costs
     const stampDuty = this.calculateStampDuty(purchasePrice, state);
@@ -332,6 +338,11 @@ class SellAndBuyCalculator {
       interestRate,
       loanTerm
     });
+
+    // Collapse the questions so the results take focus (also when loaded from
+    // a shared link); the header reopens them
+    bootstrap.Collapse.getOrCreateInstance(this.formSection).hide();
+    return true;
   }
 
   displayResults(results) {

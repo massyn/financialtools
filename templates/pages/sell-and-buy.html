@@ -7,6 +7,19 @@
     <div class="col-12 col-lg-10 col-xl-8 mx-auto">
         <h2 class="text-center mb-4">Sell and Buy Another Calculator</h2>
 
+        <!-- Collapsible questions: both property cards and the Calculate button -->
+        <div class="card border-primary shadow-sm mb-3">
+            <div class="card-body bg-light py-3">
+                <button type="button" class="collapse-toggle btn btn-link p-0 w-100 d-flex justify-content-between align-items-center text-decoration-none"
+                        data-bs-toggle="collapse" data-bs-target="#propertyDetails"
+                        aria-expanded="true" aria-controls="propertyDetails">
+                    <h5 class="card-title text-primary mb-0">Property Details</h5>
+                    <i class="bi bi-chevron-up text-primary"></i>
+                </button>
+            </div>
+        </div>
+        <div id="propertyDetails" class="collapse show">
+
         <!-- Selling and Buying Sections Side-by-Side -->
         <div class="row mb-4">
             <!-- Selling Section -->
@@ -17,12 +30,12 @@
                         <form id="sellingForm">
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-dark">Sale Price ($) *</label>
-                                <input type="number" id="salePrice" class="form-control form-control-lg"
+                                <input type="text" inputmode="numeric" autocomplete="off" id="salePrice" class="form-control form-control-lg"
                                        placeholder="e.g., 800000">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-dark">Outstanding Loan ($) *</label>
-                                <input type="number" id="outstandingLoan" class="form-control form-control-lg"
+                                <input type="text" inputmode="numeric" autocomplete="off" id="outstandingLoan" class="form-control form-control-lg"
                                        placeholder="e.g., 450000">
                             </div>
                             <div class="mb-3">
@@ -32,13 +45,13 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-dark">Conveyancer Costs ($)</label>
-                                <input type="number" id="sellingConveyancerCosts" step="0.01" min="0" class="form-control form-control-lg"
+                                <input type="text" inputmode="numeric" autocomplete="off" id="sellingConveyancerCosts" class="form-control form-control-lg"
                                        placeholder="e.g., 1500" value="1500">
                                 <small class="text-muted">Typical range: $1,000 - $2,000</small>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-dark">Current Monthly Repayment ($)</label>
-                                <input type="number" id="currentRepayment" step="0.01" min="0" class="form-control form-control-lg"
+                                <input type="text" inputmode="numeric" autocomplete="off" id="currentRepayment" class="form-control form-control-lg"
                                        placeholder="e.g., 2500">
                                 <small class="text-muted">Optional: Your current monthly loan repayment</small>
                             </div>
@@ -55,7 +68,7 @@
                         <form id="buyingForm">
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-dark">Purchase Price ($) *</label>
-                                <input type="number" id="purchasePrice" class="form-control form-control-lg"
+                                <input type="text" inputmode="numeric" autocomplete="off" id="purchasePrice" class="form-control form-control-lg"
                                        placeholder="e.g., 950000">
                             </div>
                             <div class="mb-3">
@@ -83,7 +96,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-dark">Conveyancer Costs ($)</label>
-                                <input type="number" id="buyingConveyancerCosts" step="0.01" min="0" class="form-control form-control-lg"
+                                <input type="text" inputmode="numeric" autocomplete="off" id="buyingConveyancerCosts" class="form-control form-control-lg"
                                        placeholder="e.g., 2000" value="2000">
                                 <small class="text-muted">Typical range: $1,500 - $3,000</small>
                             </div>
@@ -98,6 +111,7 @@
             <button type="submit" form="buyingForm" class="btn btn-primary btn-lg">
                 <i class="bi bi-calculator"></i> Calculate
             </button>
+        </div>
         </div>
 
         <!-- Share Button -->

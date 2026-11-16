@@ -16,7 +16,7 @@ let spendingChart = null;
 
             // Validate property price
             const propertyPrice = document.getElementById('propertyPrice');
-            if (!FinanceUtils.validateRequired(propertyPrice.value)) {
+            if (!FinanceUtils.validateRequired(FinanceUtils.parseAmount(propertyPrice.value))) {
                 FinanceUtils.setValidation(propertyPrice, false, 'Property price is required and must be positive');
                 isValid = false;
             } else {
@@ -43,7 +43,7 @@ let spendingChart = null;
 
             // Validate weekly rent
             const weeklyRent = document.getElementById('weeklyRent');
-            if (!FinanceUtils.validateRequired(weeklyRent.value)) {
+            if (!FinanceUtils.validateRequired(FinanceUtils.parseAmount(weeklyRent.value))) {
                 FinanceUtils.setValidation(weeklyRent, false, 'Weekly rent is required and must be positive');
                 isValid = false;
             } else {
@@ -52,7 +52,7 @@ let spendingChart = null;
 
             // Validate investment amount
             const investmentAmount = document.getElementById('investmentAmount');
-            if (!FinanceUtils.validateRequired(investmentAmount.value)) {
+            if (!FinanceUtils.validateRequired(FinanceUtils.parseAmount(investmentAmount.value))) {
                 FinanceUtils.setValidation(investmentAmount, false, 'Investment amount is required and must be positive');
                 isValid = false;
             } else {
@@ -63,16 +63,16 @@ let spendingChart = null;
         }
 
         function updateWeeklyCosts() {
-            const propertyPrice = parseFloat(document.getElementById('propertyPrice').value);
+            const propertyPrice = FinanceUtils.parseAmount(document.getElementById('propertyPrice').value);
             const loanTerm = parseFloat(document.getElementById('loanTerm').value);
             const interestRate = parseFloat(document.getElementById('interestRate').value) / 100;
-            const councilRates = parseFloat(document.getElementById('councilRates').value);
-            const insurance = parseFloat(document.getElementById('insurance').value);
-            const maintenance = parseFloat(document.getElementById('maintenance').value);
-            const weeklyRent = parseFloat(document.getElementById('weeklyRent').value);
+            const councilRates = FinanceUtils.parseAmount(document.getElementById('councilRates').value);
+            const insurance = FinanceUtils.parseAmount(document.getElementById('insurance').value);
+            const maintenance = FinanceUtils.parseAmount(document.getElementById('maintenance').value);
+            const weeklyRent = FinanceUtils.parseAmount(document.getElementById('weeklyRent').value);
 
             // Get investment amount and convert to weekly if needed
-            const investmentAmount = parseFloat(document.getElementById('investmentAmount').value);
+            const investmentAmount = FinanceUtils.parseAmount(document.getElementById('investmentAmount').value);
             const investmentFrequency = document.getElementById('investmentFrequency').value;
             const weeklyInvestment = investmentFrequency === 'monthly' ? (investmentAmount * 12 / 52) : investmentAmount;
 
@@ -115,18 +115,18 @@ let spendingChart = null;
 
             // Get inputs
             const cpiRate = parseFloat(document.getElementById('cpiRate').value) / 100;
-            const propertyPrice = parseFloat(document.getElementById('propertyPrice').value);
+            const propertyPrice = FinanceUtils.parseAmount(document.getElementById('propertyPrice').value);
             const loanTerm = parseFloat(document.getElementById('loanTerm').value);
             const interestRate = parseFloat(document.getElementById('interestRate').value) / 100;
-            const councilRates = parseFloat(document.getElementById('councilRates').value);
-            const insurance = parseFloat(document.getElementById('insurance').value);
-            const maintenance = parseFloat(document.getElementById('maintenance').value);
-            const weeklyRent = parseFloat(document.getElementById('weeklyRent').value);
+            const councilRates = FinanceUtils.parseAmount(document.getElementById('councilRates').value);
+            const insurance = FinanceUtils.parseAmount(document.getElementById('insurance').value);
+            const maintenance = FinanceUtils.parseAmount(document.getElementById('maintenance').value);
+            const weeklyRent = FinanceUtils.parseAmount(document.getElementById('weeklyRent').value);
             const rentIncrease = parseFloat(document.getElementById('rentIncrease').value) / 100;
             const propertyGrowth = parseFloat(document.getElementById('propertyGrowth').value) / 100;
 
             // Get investment amount and convert to weekly if needed
-            const investmentAmount = parseFloat(document.getElementById('investmentAmount').value);
+            const investmentAmount = FinanceUtils.parseAmount(document.getElementById('investmentAmount').value);
             const investmentFrequency = document.getElementById('investmentFrequency').value;
             const weeklyInvestment = investmentFrequency === 'monthly' ? (investmentAmount * 12 / 52) : investmentAmount;
 
@@ -546,6 +546,9 @@ let spendingChart = null;
 
             document.getElementById('results').style.display = 'block';
 
+            // Collapse the questions so the results take focus; the header reopens them
+            bootstrap.Collapse.getOrCreateInstance(document.getElementById('scenarioDetails')).hide();
+
             // Draw spending chart
             const spendingCtx = document.getElementById('spendingChart').getContext('2d');
 
@@ -729,3 +732,7 @@ let spendingChart = null;
         inputs.forEach(id => {
             document.getElementById(id).addEventListener('input', updateWeeklyCosts);
         });
+
+        // Thousand-separate the money fields as the user types
+        ['propertyPrice', 'councilRates', 'insurance', 'maintenance', 'weeklyRent', 'investmentAmount']
+            .forEach(id => FinanceUtils.attachThousandsSeparator(document.getElementById(id)));

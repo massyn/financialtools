@@ -12,6 +12,7 @@ class InvestmentCalculator {
       investmentYears: document.getElementById('investmentYears'),
       annualReturn: document.getElementById('annualReturn')
     };
+    this.formSection = document.getElementById('investmentDetails');
     this.resultsContainer = document.getElementById('resultsContainer');
 
     // Attach event listeners
@@ -22,15 +23,21 @@ class InvestmentCalculator {
     // Handle form submission
     this.form.addEventListener('submit', (e) => {
       e.preventDefault();
-      this.calculate();
+      if (this.calculate()) {
+        // Collapse the questions so the results take focus; the header reopens them
+        bootstrap.Collapse.getOrCreateInstance(this.formSection).hide();
+      }
     });
+
+    // Thousand-separate the savings amount as the user types
+    FinanceUtils.attachThousandsSeparator(this.inputs.monthlyAmount);
   }
 
   validate() {
     let isValid = true;
 
     // Validate monthly amount
-    if (!FinanceUtils.validateRequired(this.inputs.monthlyAmount.value)) {
+    if (!FinanceUtils.validateRequired(FinanceUtils.parseAmount(this.inputs.monthlyAmount.value))) {
       FinanceUtils.setValidation(this.inputs.monthlyAmount, false, 'Monthly amount is required and must be a positive number');
       isValid = false;
     } else {
@@ -62,11 +69,11 @@ class InvestmentCalculator {
 
     // Validate inputs
     if (!this.validate()) {
-      return;
+      return false;
     }
 
     // Parse input values
-    const monthly = parseFloat(this.inputs.monthlyAmount.value);
+    const monthly = FinanceUtils.parseAmount(this.inputs.monthlyAmount.value);
     const years = parseFloat(this.inputs.investmentYears.value);
     const returnRate = parseFloat(this.inputs.annualReturn.value) / 100;
     const monthlyRate = returnRate / 12;
@@ -101,6 +108,8 @@ class InvestmentCalculator {
       futureValue: Math.round(futureValue),
       compoundAdvantage: Math.round(compoundReturn - simpleReturn)
     });
+
+    return true;
   }
 
   displayResults(results) {

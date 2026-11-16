@@ -12,6 +12,7 @@ class AffordabilityCalculator {
       interestRate: document.getElementById('interestRate'),
       paymentFrequency: document.getElementById('paymentFrequency')
     };
+    this.formSection = document.getElementById('borrowingDetails');
     this.resultsContainer = document.getElementById('resultsContainer');
     this.paymentLabel = document.getElementById('paymentLabel');
 
@@ -23,8 +24,14 @@ class AffordabilityCalculator {
     // Handle form submission
     this.form.addEventListener('submit', (e) => {
       e.preventDefault();
-      this.calculate();
+      if (this.calculate()) {
+        // Collapse the questions so the results take focus; the header reopens them
+        bootstrap.Collapse.getOrCreateInstance(this.formSection).hide();
+      }
     });
+
+    // Thousand-separate the payment amount as the user types
+    FinanceUtils.attachThousandsSeparator(this.inputs.paymentAmount);
 
     // Update payment label when frequency changes
     this.inputs.paymentFrequency.addEventListener('change', () => {
@@ -41,7 +48,7 @@ class AffordabilityCalculator {
     let isValid = true;
 
     // Validate payment amount
-    if (!FinanceUtils.validateRequired(this.inputs.paymentAmount.value)) {
+    if (!FinanceUtils.validateRequired(FinanceUtils.parseAmount(this.inputs.paymentAmount.value))) {
       FinanceUtils.setValidation(this.inputs.paymentAmount, false, 'Payment amount is required and must be a positive number');
       isValid = false;
     } else {
@@ -65,11 +72,11 @@ class AffordabilityCalculator {
 
     // Validate inputs
     if (!this.validate()) {
-      return;
+      return false;
     }
 
     // Parse input values
-    const payment = parseFloat(this.inputs.paymentAmount.value);
+    const payment = FinanceUtils.parseAmount(this.inputs.paymentAmount.value);
     const annualRate = parseFloat(this.inputs.interestRate.value) / 100;
     const monthlyRate = annualRate / 12;
     const isWeekly = this.inputs.paymentFrequency.value === 'weekly';
@@ -101,6 +108,8 @@ class AffordabilityCalculator {
       originalPayment: payment,
       interestRate: this.inputs.interestRate.value
     });
+
+    return true;
   }
 
   displayResults(results) {

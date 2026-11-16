@@ -84,6 +84,44 @@ const FinanceUtils = {
   },
 
   /**
+   * Thousand-separate a money input as the user types (e.g. 1234567 -> 1,234,567),
+   * keeping the caret after the same digit it was after before reformatting.
+   * The input should be type="text" inputmode="numeric"; read it with parseAmount().
+   * @param {HTMLInputElement} input - The money input element
+   */
+  attachThousandsSeparator(input) {
+    const format = () => {
+      const caret = input.selectionStart ?? input.value.length;
+      const digitsBeforeCaret = input.value.slice(0, caret).replace(/\D/g, '').length;
+      const digits = input.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
+      const formatted = digits ? Number(digits).toLocaleString('en-AU') : '';
+
+      let newCaret = 0;
+      for (let seen = 0; newCaret < formatted.length && seen < digitsBeforeCaret; newCaret++) {
+        if (/\d/.test(formatted[newCaret])) seen++;
+      }
+
+      input.value = formatted;
+      if (document.activeElement === input) {
+        input.setSelectionRange(newCaret, newCaret);
+      }
+    };
+
+    input.addEventListener('input', format);
+    // Format any default value already in the field
+    if (input.value) format();
+  },
+
+  /**
+   * Parse a (possibly thousand-separated) amount, e.g. "500,000" -> 500000
+   * @param {string|number} value - The value to parse
+   * @returns {number} The parsed number, or NaN if it is not a number
+   */
+  parseAmount(value) {
+    return parseFloat(String(value).replace(/,/g, ''));
+  },
+
+  /**
    * Format a number as percentage
    * @param {number|string} num - The number to format (e.g., 0.055 or 5.5)
    * @param {number} decimals - Number of decimal places (default: 2)

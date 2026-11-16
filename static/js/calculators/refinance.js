@@ -15,6 +15,7 @@ class RefinanceCalculator {
       newInterestRate: document.getElementById('newInterestRate'),
       newLoanTerm: document.getElementById('newLoanTerm')
     };
+    this.formSection = document.getElementById('refinanceDetails');
     this.resultsContainer = document.getElementById('resultsContainer');
     this.currentPaymentLabel = document.getElementById('currentPaymentLabel');
 
@@ -26,13 +27,20 @@ class RefinanceCalculator {
     // Handle form submission
     this.form.addEventListener('submit', (e) => {
       e.preventDefault();
-      this.calculate();
+      if (this.calculate()) {
+        // Collapse the questions so the results take focus; the header reopens them
+        bootstrap.Collapse.getOrCreateInstance(this.formSection).hide();
+      }
     });
+
+    // Thousand-separate the money fields as the user types
+    FinanceUtils.attachThousandsSeparator(this.inputs.currentOutstandingAmount);
+    FinanceUtils.attachThousandsSeparator(this.inputs.currentPaymentAmount);
 
     // Update payment label when frequency changes
     this.inputs.currentPaymentFrequency.addEventListener('change', () => {
       const frequency = this.inputs.currentPaymentFrequency.value;
-      this.currentPaymentLabel.textContent = `Current ${frequency === 'weekly' ? 'Weekly' : 'Monthly'} Payment ($) *`;
+      this.currentPaymentLabel.textContent = `${frequency === 'weekly' ? 'Weekly' : 'Monthly'} Payment ($) *`;
 
       // Update placeholder
       const placeholder = frequency === 'weekly' ? 'e.g., 550' : 'e.g., 2,400';
@@ -44,7 +52,7 @@ class RefinanceCalculator {
     let isValid = true;
 
     // Validate current outstanding amount
-    if (!FinanceUtils.validateRequired(this.inputs.currentOutstandingAmount.value)) {
+    if (!FinanceUtils.validateRequired(FinanceUtils.parseAmount(this.inputs.currentOutstandingAmount.value))) {
       FinanceUtils.setValidation(this.inputs.currentOutstandingAmount, false, 'Outstanding amount is required and must be a positive number');
       isValid = false;
     } else {
@@ -53,15 +61,15 @@ class RefinanceCalculator {
 
     // Validate current interest rate
     if (!FinanceUtils.validateRequired(this.inputs.currentInterestRate.value)) {
-      FinanceUtils.setValidation(this.inputs.currentInterestRate, false, 'Current interest rate is required and must be a positive number');
+      FinanceUtils.setValidation(this.inputs.currentInterestRate, false, 'Interest rate is required and must be a positive number');
       isValid = false;
     } else {
       FinanceUtils.setValidation(this.inputs.currentInterestRate, true);
     }
 
     // Validate current payment amount
-    if (!FinanceUtils.validateRequired(this.inputs.currentPaymentAmount.value)) {
-      FinanceUtils.setValidation(this.inputs.currentPaymentAmount, false, 'Current payment amount is required and must be a positive number');
+    if (!FinanceUtils.validateRequired(FinanceUtils.parseAmount(this.inputs.currentPaymentAmount.value))) {
+      FinanceUtils.setValidation(this.inputs.currentPaymentAmount, false, 'Payment amount is required and must be a positive number');
       isValid = false;
     } else {
       FinanceUtils.setValidation(this.inputs.currentPaymentAmount, true);
@@ -92,13 +100,13 @@ class RefinanceCalculator {
 
     // Validate inputs
     if (!this.validate()) {
-      return;
+      return false;
     }
 
     // Parse input values
-    const outstandingAmount = parseFloat(this.inputs.currentOutstandingAmount.value);
+    const outstandingAmount = FinanceUtils.parseAmount(this.inputs.currentOutstandingAmount.value);
     const currentRate = parseFloat(this.inputs.currentInterestRate.value) / 100;
-    const currentPayment = parseFloat(this.inputs.currentPaymentAmount.value);
+    const currentPayment = FinanceUtils.parseAmount(this.inputs.currentPaymentAmount.value);
     const newRate = parseFloat(this.inputs.newInterestRate.value) / 100;
     const newTermYears = parseFloat(this.inputs.newLoanTerm.value);
 
@@ -108,6 +116,16 @@ class RefinanceCalculator {
     const currentMonthlyRate = currentRate / 12;
     const newMonthlyRate = newRate / 12;
     const newNumberOfPayments = newTermYears * 12;
+
+    // The current loan only pays off if the payment covers more than the interest
+    const monthlyInterest = outstandingAmount * currentMonthlyRate;
+    if (currentMonthlyPayment <= monthlyInterest) {
+      const interestPerPeriod = isCurrentWeekly ? monthlyInterest / (52/12) : monthlyInterest;
+      const period = isCurrentWeekly ? 'weekly' : 'monthly';
+      FinanceUtils.setValidation(this.inputs.currentPaymentAmount, false,
+        `Payment must be more than the ${period} interest of ${FinanceUtils.formatCurrency(Math.ceil(interestPerPeriod))}, or the loan never pays off`);
+      return false;
+    }
 
     // Calculate new loan payment
     const newMonthlyPayment = (outstandingAmount * newMonthlyRate * Math.pow(1 + newMonthlyRate, newNumberOfPayments)) /
@@ -137,6 +155,7 @@ class RefinanceCalculator {
 
     // Display results
     this.displayResults({
+      outstandingAmount,
       currentLoan: {
         monthlyPayment: Math.round(currentMonthlyPayment),
         weeklyPayment: Math.round(currentMonthlyPayment / (52/12)),
@@ -159,6 +178,8 @@ class RefinanceCalculator {
         totalSavings: Math.round(interestSavings + (paymentDifference * newNumberOfPayments))
       }
     });
+
+    return true;
   }
 
   displayResults(results) {
@@ -254,6 +275,25 @@ class RefinanceCalculator {
                 </tbody>
               </table>
             </div>
+
+            <div class="row g-4 mt-1 mb-4">
+              <div class="col-12 col-lg-6">
+                <h6>Monthly Repayments</h6>
+                <p class="small text-muted mb-2">What each loan costs you every month.</p>
+                <div style="position: relative; height: 170px;">
+                  <canvas id="repaymentChart" role="img"
+                          aria-label="Bar chart comparing the monthly repayment of the current and refinanced loans"></canvas>
+                </div>
+              </div>
+              <div class="col-12 col-lg-6">
+                <h6>Total Cost of the Loan</h6>
+                <p class="small text-muted mb-2">The loan, plus the interest you pay on it.</p>
+                <div style="position: relative; height: 190px;">
+                  <canvas id="refinanceCostChart" role="img"
+                          aria-label="Bar chart of the loan and its interest for the current and refinanced loans"></canvas>
+                </div>
+              </div>
+            </div>
     `;
 
     if (results.comparison.interestSavings > 0) {
@@ -299,6 +339,16 @@ class RefinanceCalculator {
     `;
 
     this.resultsContainer.innerHTML = html;
+
+    const c = FinanceCharts.colours;
+    FinanceCharts.compareAmounts('repaymentChart', [
+      { label: 'Current loan', value: results.currentLoan.monthlyPayment, colour: c.baseline },
+      { label: 'Refinanced loan', value: results.newLoan.monthlyPayment, colour: c.alternative }
+    ], 'Monthly repayment');
+    FinanceCharts.totalCost('refinanceCostChart', [
+      { label: 'Current loan', borrowed: results.outstandingAmount, interest: results.currentLoan.remainingInterest },
+      { label: 'Refinanced loan', borrowed: results.outstandingAmount, interest: results.newLoan.totalInterest }
+    ], 'Loan');
   }
 }
 

@@ -33,15 +33,21 @@ class InvestmentOptionsCalculator {
         // Handle form submission
         this.form.addEventListener('submit', (e) => {
             e.preventDefault();
-            this.calculate();
+            if (this.calculate()) {
+                // Collapse the questions so the results take focus; the header reopens them
+                bootstrap.Collapse.getOrCreateInstance(document.getElementById('investmentOptionsDetails')).hide();
+            }
         });
+
+        // Thousand-separate the investment amount as the user types
+        FinanceUtils.attachThousandsSeparator(this.inputs.investmentAmount);
     }
 
     validate() {
         let isValid = true;
 
         // Validate investment amount
-        if (!FinanceUtils.validateRequired(this.inputs.investmentAmount.value)) {
+        if (!FinanceUtils.validateRequired(FinanceUtils.parseAmount(this.inputs.investmentAmount.value))) {
             FinanceUtils.setValidation(this.inputs.investmentAmount, false, 'Investment amount is required and must be positive');
             isValid = false;
         } else {
@@ -65,11 +71,11 @@ class InvestmentOptionsCalculator {
 
         // Validate inputs
         if (!this.validate()) {
-            return;
+            return false;
         }
 
         // Parse input values
-        const amount = parseFloat(this.inputs.investmentAmount.value);
+        const amount = FinanceUtils.parseAmount(this.inputs.investmentAmount.value);
         const frequency = this.inputs.investmentFrequency.value;
         const years = parseFloat(this.inputs.investmentYears.value);
 
@@ -154,6 +160,8 @@ class InvestmentOptionsCalculator {
             years,
             totalSaved
         });
+
+        return true;
     }
 
     calculateFutureValue(monthlyContribution, annualRate, totalMonths) {

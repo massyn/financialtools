@@ -1,5 +1,5 @@
 /**
- * Loan Calculator
+ * Loan Repayment
  * Calculates loan payments, amortization schedules, and extra payment impacts
  */
 
@@ -14,6 +14,7 @@ class LoanCalculator {
       extraPayment: document.getElementById('extraPayment'),
       paymentFrequency: document.getElementById('paymentFrequency')
     };
+    this.formSection = document.getElementById('loanDetails');
     this.resultsContainer = document.getElementById('resultsContainer');
     this.extraPaymentLabel = document.getElementById('extraPaymentLabel');
 
@@ -25,8 +26,15 @@ class LoanCalculator {
     // Handle form submission
     this.form.addEventListener('submit', (e) => {
       e.preventDefault();
-      this.calculate();
+      if (this.calculate()) {
+        // Collapse the questions so the results take focus; the header reopens them
+        bootstrap.Collapse.getOrCreateInstance(this.formSection).hide();
+      }
     });
+
+    // Thousand-separate the money fields as the user types
+    FinanceUtils.attachThousandsSeparator(this.inputs.loanAmount);
+    FinanceUtils.attachThousandsSeparator(this.inputs.extraPayment);
 
     // Update extra payment label when frequency changes
     this.inputs.paymentFrequency.addEventListener('change', () => {
@@ -43,7 +51,7 @@ class LoanCalculator {
     let isValid = true;
 
     // Validate loan amount
-    if (!FinanceUtils.validateRequired(this.inputs.loanAmount.value)) {
+    if (!FinanceUtils.validateRequired(FinanceUtils.parseAmount(this.inputs.loanAmount.value))) {
       FinanceUtils.setValidation(this.inputs.loanAmount, false, 'Loan amount is required and must be a positive number');
       isValid = false;
     } else {
@@ -75,23 +83,26 @@ class LoanCalculator {
 
     // Validate inputs
     if (!this.validate()) {
-      return;
+      return false;
     }
 
     // Parse input values
-    const principal = parseFloat(this.inputs.loanAmount.value);
+    const principal = FinanceUtils.parseAmount(this.inputs.loanAmount.value);
     const annualRate = parseFloat(this.inputs.interestRate.value) / 100;
     const monthlyRate = annualRate / 12;
     const numberOfPayments = parseFloat(this.inputs.loanTerm.value) * 12;
-    const extra = parseFloat(this.inputs.extraPayment.value) || 0;
+    const extra = FinanceUtils.parseAmount(this.inputs.extraPayment.value) || 0;
     const isWeekly = this.inputs.paymentFrequency.value === 'weekly';
 
     // Calculate monthly payment using standard mortgage formula
     const monthlyPayment = (principal * monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) /
                           (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
 
+    // The schedule runs monthly. The extra payment is entered per selected
+    // period, so convert a weekly extra to its monthly equivalent (x 52 / 12).
     const displayPayment = isWeekly ? monthlyPayment / (52/12) : monthlyPayment;
-    const displayExtra = isWeekly ? extra / (52/12) : extra;
+    const displayExtra = extra;
+    const monthlyExtra = isWeekly ? extra * (52/12) : extra;
 
     // Calculate totals
     const totalAmount = monthlyPayment * numberOfPayments;
@@ -107,7 +118,7 @@ class LoanCalculator {
         monthlyRate,
         monthlyPayment,
         numberOfPayments,
-        extra,
+        monthlyExtra,
         totalInterest,
         displayExtra,
         isWeekly
@@ -126,6 +137,8 @@ class LoanCalculator {
       loanTerm: parseFloat(this.inputs.loanTerm.value),
       extraResults
     });
+
+    return true;
   }
 
   calculateAmortization(principal, monthlyRate, monthlyPayment, numberOfPayments) {
@@ -197,7 +210,7 @@ class LoanCalculator {
   }
 
   calculateSuggestion() {
-    const principal = parseFloat(this.inputs.loanAmount.value);
+    const principal = FinanceUtils.parseAmount(this.inputs.loanAmount.value);
     const annualRate = parseFloat(this.inputs.interestRate.value) / 100;
     const monthlyRate = annualRate / 12;
     const numberOfPayments = parseFloat(this.inputs.loanTerm.value) * 12;
@@ -302,6 +315,13 @@ class LoanCalculator {
                 </tbody>
               </table>
             </div>
+
+            <h6 class="mt-4">Total Cost of the Loan</h6>
+            <p class="small text-muted mb-2">What you borrowed, plus the interest you pay on it.</p>
+            <div class="mb-4" style="position: relative; height: ${results.extraResults ? 190 : 130}px;">
+              <canvas id="totalCostChart" role="img"
+                      aria-label="Bar chart of the amount borrowed and total interest for each scenario"></canvas>
+            </div>
     `;
 
     // Show suggestion if no extra payment
@@ -326,7 +346,26 @@ class LoanCalculator {
       `;
     }
 
+    const splitScenario = results.extraResults ? 'with your extra payments' : 'for the standard loan';
     html += `
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <h5>Loan Balance Over Time</h5>
+            <p class="small text-muted mb-2">How much you still owe at the end of each year.</p>
+            <div class="mb-4" style="position: relative; height: 300px;">
+              <canvas id="balanceChart" role="img"
+                      aria-label="Line chart of the loan balance at the end of each year"></canvas>
+            </div>
+
+            <h5>Principal vs Interest Each Year</h5>
+            <p class="small text-muted mb-2">How each year's repayments split between paying down the loan and interest, ${splitScenario}.</p>
+            <div style="position: relative; height: 300px;">
+              <canvas id="yearlySplitChart" role="img"
+                      aria-label="Stacked bar chart of principal and interest paid in each year"></canvas>
+            </div>
           </div>
         </div>
 
@@ -386,6 +425,33 @@ class LoanCalculator {
     `;
 
     this.resultsContainer.innerHTML = html;
+
+    const scenarios = [
+      { label: 'Standard loan', borrowed: results.loanAmount, interest: results.totalInterest }
+    ];
+    if (results.extraResults) {
+      scenarios.push({
+        label: 'With extra payments',
+        borrowed: results.loanAmount,
+        interest: results.extraResults.totalInterestWithExtra
+      });
+    }
+    FinanceCharts.totalCost('totalCostChart', scenarios);
+
+    const balanceScenarios = [
+      { label: 'Standard loan', colour: FinanceCharts.colours.baseline, schedule: results.amortizationSchedule }
+    ];
+    if (results.extraResults) {
+      balanceScenarios.push({
+        label: 'With extra payments',
+        colour: FinanceCharts.colours.alternative,
+        schedule: results.extraResults.extraAmortizationSchedule
+      });
+    }
+    LoanCharts.balanceOverTime('balanceChart', results.loanAmount, results.loanTerm, balanceScenarios);
+
+    LoanCharts.yearlySplit('yearlySplitChart',
+      results.extraResults ? results.extraResults.extraAmortizationSchedule : results.amortizationSchedule);
   }
 }
 

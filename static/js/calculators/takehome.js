@@ -199,11 +199,14 @@ class TakeHomeCalculator {
                   <tr class="table-light">
                     <th colspan="2" class="text-uppercase small text-muted">${title}</th>
                   </tr>`;
-      const row = (label, annual, rowClass = '') => `
+      const row = (label, annual, { bold = false, rowClass = '' } = {}) => {
+        const cell = (text) => (bold ? `<strong>${text}</strong>` : text);
+        return `
                   <tr class="${rowClass}">
-                    <td>${label}</td>
-                    <td class="text-end">${money(annual)}</td>
+                    <td>${cell(label)}</td>
+                    <td class="text-end">${cell(money(annual))}</td>
                   </tr>`;
+      };
 
       return `
               <div class="table-responsive">
@@ -215,12 +218,12 @@ class TakeHomeCalculator {
                     ${section('Income')}
                     ${row('Base salary', results.baseSalary)}
                     ${row(superLabel, results.superAmount)}
-                    ${row('<strong>Salary package</strong>', results.salaryPackage, 'fw-bold')}
+                    ${row('Salary package', results.salaryPackage, { bold: true })}
                     ${section('Expenses')}
                     ${expenses.map(([label, amount]) => row(label, amount)).join('')}
-                    ${row('<strong>Total expenses</strong>', totalExpenses, 'fw-bold')}
+                    ${row('Total expenses', totalExpenses, { bold: true })}
                     ${section('Net')}
-                    ${row('<strong>Take-home pay</strong>', results.takeHomeAnnual, 'table-success fw-bold')}
+                    ${row('Take-home pay', results.takeHomeAnnual, { bold: true, rowClass: 'table-success' })}
                   </tbody>
                 </table>
               </div>`;

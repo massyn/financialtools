@@ -50,31 +50,11 @@ class TakeHomeCalculator {
     });
 
     // Thousand-separate the salary as the user types
-    this.inputs.annualSalary.addEventListener('input', () => this.formatSalaryInput());
-  }
-
-  /**
-   * Reformat the salary field with thousand separators, keeping the caret
-   * after the same digit it was after before reformatting.
-   */
-  formatSalaryInput() {
-    const input = this.inputs.annualSalary;
-    const caret = input.selectionStart ?? input.value.length;
-    const digitsBeforeCaret = input.value.slice(0, caret).replace(/\D/g, '').length;
-    const digits = input.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
-    const formatted = digits ? Number(digits).toLocaleString('en-AU') : '';
-
-    let newCaret = 0;
-    for (let seen = 0; newCaret < formatted.length && seen < digitsBeforeCaret; newCaret++) {
-      if (/\d/.test(formatted[newCaret])) seen++;
-    }
-
-    input.value = formatted;
-    input.setSelectionRange(newCaret, newCaret);
+    FinanceUtils.attachThousandsSeparator(this.inputs.annualSalary);
   }
 
   getSalary() {
-    return parseFloat(this.inputs.annualSalary.value.replace(/,/g, ''));
+    return FinanceUtils.parseAmount(this.inputs.annualSalary.value);
   }
 
   validate() {

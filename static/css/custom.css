@@ -242,6 +242,12 @@ h3 { font-size: 1.05rem; font-weight: 600; }
   overflow-x: auto;
 }
 
+/* Opt out of the height cap where the whole table should flow with the page */
+.table-responsive.table-uncapped {
+  max-height: none;
+  overflow-y: visible;
+}
+
 .table-sm td, .table-sm th {
   padding: 0.5rem;
 }

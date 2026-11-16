@@ -8,7 +8,6 @@ class TakeHomeCalculator {
     // Cache DOM elements
     this.form = document.getElementById('takeHomeForm');
     this.inputs = {
-      paymentFrequency: document.getElementById('paymentFrequency'),
       annualSalary: document.getElementById('annualSalary'),
       includesSuper: document.getElementById('includesSuper'),
       medicareLevy: document.getElementById('medicareLevy'),
@@ -90,7 +89,6 @@ class TakeHomeCalculator {
     const taxYear = this.inputs.taxYear.value;
     const includesSuper = this.inputs.includesSuper.value === 'yes';
     const payMedicareLevy = this.inputs.medicareLevy.value === 'yes';
-    const paymentFrequency = this.inputs.paymentFrequency.value;
 
     const taxYearData = this.taxData.rates[taxYear];
     const lookupData = this.taxData.lookup[taxYear];
@@ -152,7 +150,7 @@ class TakeHomeCalculator {
     const totalSuper = superAmount + sacrificeAmount;
 
     // Values are passed unrounded; formatCurrency rounds for display so the
-    // periodic tab is derived from exact annual figures.
+    // periodic tabs are derived from exact annual figures.
     this.displayResults({
       employerSalary: salary,
       includesSuper,
@@ -167,7 +165,6 @@ class TakeHomeCalculator {
       taxSavings,
       totalSuper,
       takeHomeAnnual,
-      paymentFrequency,
       taxYear
     });
 
@@ -175,7 +172,6 @@ class TakeHomeCalculator {
   }
 
   displayResults(results) {
-    const frequencyLabel = results.paymentFrequency === 'weekly' ? 'Weekly' : 'Monthly';
     const pct = (rate) => `${parseFloat((rate * 100).toFixed(2))}%`;
 
     const expenses = [];
@@ -225,11 +221,8 @@ class TakeHomeCalculator {
     };
 
     const tabs = [
-      {
-        id: 'breakdown-periodic',
-        label: frequencyLabel,
-        divisor: results.paymentFrequency === 'weekly' ? 52 : 12
-      },
+      { id: 'breakdown-monthly', label: 'Monthly', divisor: 12 },
+      { id: 'breakdown-weekly', label: 'Weekly', divisor: 52 },
       { id: 'breakdown-annual', label: 'Annual', divisor: 1 }
     ];
 

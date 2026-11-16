@@ -29,9 +29,10 @@ implementation. New and updated calculators follow it.
 
 - Money fields are `type="text" inputmode="numeric" autocomplete="off"`, not `type="number"`
   (a number input cannot show separators). Rates, percentages and years stay `type="number"`.
-- On `input`, reformat the value with `toLocaleString('en-AU')` and keep the caret after the same digit
-  (see `formatSalaryInput()`).
-- Parse with the commas stripped (see `getSalary()`) before validating or calculating.
+- Wire each one with `FinanceUtils.attachThousandsSeparator(input)`, which reformats on `input` and keeps
+  the caret after the same digit.
+- Read it with `FinanceUtils.parseAmount(input.value)` (commas stripped) before validating or
+  calculating; plain `parseFloat("500,000")` returns 500.
 
 ### Collapsible question section
 
@@ -55,6 +56,16 @@ implementation. New and updated calculators follow it.
   column; items they are built from are indented in the middle column, so the right column reads as a
   running sum (base salary - total expenses = take-home pay).
 
+### Charts
+
+- Chart.js, pinned to an exact version with an integrity hash, loaded only on pages that chart.
+- A calculator's charts live in their own file (e.g. `loan-charts.js`), loaded before the calculator
+  script; the calculator passes it plain data after rendering the results HTML.
+- Destroy and redraw a chart on every calculation (see `LoanCharts.render()`).
+- Colours come from the validated categorical palette in fixed order: `#2a78d6` (blue), `#eb6834`
+  (orange), `#1baf7a` (aqua). Keep a legend, a tooltip, recessive grid lines, and a table elsewhere on the
+  page that holds the same numbers.
+
 ### Other conventions
 
 - Default the tax year to the current Australian financial year (1 July - 30 June), worked out in the
@@ -66,9 +77,8 @@ implementation. New and updated calculators follow it.
 
 ## Todo: bring other calculators to the pattern
 
-- [ ] **loan-calculator**: thousand separators on Loan Amount and Extra Payment; collapsible form.
-      Payment frequency changes the repayment schedule, so keep it as a question; consider tabs only for
-      the summary figures.
+- [x] **loan-calculator**: thousand separators on Loan Amount and Extra Payment; collapsible form;
+      Total Cost of the Loan chart. Payment frequency kept as a question.
 - [ ] **borrowing-capacity**: thousand separators on the payment amount; collapsible form. Payment
       frequency describes the input amount, so it stays a question.
 - [ ] **refinance**: thousand separators on Outstanding Amount and Current Payment Amount; collapsible
@@ -83,9 +93,7 @@ implementation. New and updated calculators follow it.
 - [ ] **simple-investment**: thousand separators on Monthly Savings Amount; collapsible form.
 - [ ] **investment-options**: thousand separators on Investment Amount; collapsible form. Review whether
       the investment frequency question is display-only and could become tabs.
-- [ ] **Shared helper**: once a second calculator needs thousand-separated inputs, move
-      `formatSalaryInput()` / `getSalary()` into `FinanceUtils` as generic helpers rather than copying
-      them.
+- [x] **Shared helper**: thousand-separator formatting and parsing moved into `FinanceUtils`.
 - [ ] **Table height cap**: `custom.css` caps every `.table-responsive` at 500px with an inner scrollbar
       (the home page opts out with `.table-uncapped`). Decide per calculator whether long tables should
       scroll inside a box or flow with the page.
